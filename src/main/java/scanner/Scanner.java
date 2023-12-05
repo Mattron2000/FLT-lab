@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PushbackReader;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import token.*;
 
@@ -13,15 +15,90 @@ public class Scanner {
 	private PushbackReader buffer;
 	private String log;
 
-	// skpChars: insieme caratteri di skip (include EOF) e inizializzazione
-	// letters: insieme lettere e inizializzazione
-	// digits: cifre e inizializzazione
+	/**
+	 * insieme caratteri di skip (include EOF) e inizializzazione
+	 */
+	private static final ArrayList<Character> skipChars;
+	static {
+		skipChars = new ArrayList<>();
+		skipChars.add(' ');
+		skipChars.add('\n');
+		skipChars.add('\t');
+		skipChars.add('\r');
+	}
 
-	// char_type_Map: mapping fra caratteri '+', '-', '*', '/', ';', '=', ';' e il
-	// TokenType corrispondente
+	/**
+	 * insieme lettere e inizializzazione
+	 */
+	private static final ArrayList<Character> letters;
+	static {
+		letters = new ArrayList<>();
+		for (int i = (int) 'a'; i <= (int) 'z'; i++)
+			letters.add((char) i);
+		for (int i = (int) 'A'; i <= (int) 'Z'; i++)
+			letters.add((char) i);
 
-	// keyWordsMap: mapping fra le stringhe "print", "float", "int" e il
-	// TokenType corrispondente
+		// DEBUG
+		// for (Character c :
+		// letters) {
+		// System.out.println(c);
+		// }
+	}
+
+	/**
+	 * cifre e inizializzazione
+	 */
+	private static final ArrayList<Character> digits;
+	static {
+		digits = new ArrayList<>();
+		for (int i = (int) '0'; i <= (int) '9'; i++)
+			digits.add((char) i);
+
+		// DEBUG
+		// for (Character c :
+		// digits) {
+		// System.out.println(c);
+		// }
+	}
+
+	/**
+	 * mapping fra caratteri '+', '-', '*', '/', ';', '=' e il TokenType
+	 * corrispondente
+	 */
+	private static final HashMap<Character, TokenType> charTypeHMap;
+	static {
+		charTypeHMap = new HashMap<>();
+		charTypeHMap.put('+', TokenType.PLUS);
+		charTypeHMap.put('-', TokenType.MINUS);
+		charTypeHMap.put('*', TokenType.MULT);
+		charTypeHMap.put('/', TokenType.DIVIDE);
+		charTypeHMap.put(';', TokenType.SEMICOLON);
+		charTypeHMap.put('=', TokenType.ASSIGN);
+
+		// DEBUG
+		// for (Character c :
+		// charTypeHMap.keySet()) {
+		// System.out.println("char: " + c + "\tToken type: " + charTypeHMap.get(c));
+		// }
+	}
+
+	/**
+	 * mapping fra le stringhe "print", "float", "int" e il TokenType corrispondente
+	 */
+	private static final HashMap<String, TokenType> keywordHMap;
+	static {
+		keywordHMap = new HashMap<>();
+		keywordHMap.put("print", TokenType.PRINT);
+		keywordHMap.put("float", TokenType.FLOAT_KW);
+		keywordHMap.put("int", TokenType.INT_KW);
+
+		// DEBUG
+		// for (String kw :
+		// keywordHMap.keySet()) {
+		// System.out.println("keyword: " + kw + "\tToken type: " +
+		// keywordHMap.get(kw));
+		// }
+	}
 
 	public Scanner(String fileName) throws FileNotFoundException {
 
