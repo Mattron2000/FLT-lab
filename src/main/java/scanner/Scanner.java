@@ -7,7 +7,10 @@ import java.io.PushbackReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import token.*;
+import token.Token;
+import token.TokenType;
+
+// import token.*;
 
 public class Scanner {
 	final char EOF = (char) -1;
@@ -39,10 +42,8 @@ public class Scanner {
 			letters.add((char) i);
 
 		// DEBUG
-		// for (Character c :
-		// letters) {
+		// for (Character c : letters)
 		// System.out.println(c);
-		// }
 	}
 
 	/**
@@ -55,10 +56,8 @@ public class Scanner {
 			digits.add((char) i);
 
 		// DEBUG
-		// for (Character c :
-		// digits) {
+		// for (Character c : digits)
 		// System.out.println(c);
-		// }
 	}
 
 	/**
@@ -76,10 +75,8 @@ public class Scanner {
 		charTypeHMap.put('=', TokenType.ASSIGN);
 
 		// DEBUG
-		// for (Character c :
-		// charTypeHMap.keySet()) {
+		// for (Character c : charTypeHMap.keySet())
 		// System.out.println("char: " + c + "\tToken type: " + charTypeHMap.get(c));
-		// }
 	}
 
 	/**
@@ -93,11 +90,9 @@ public class Scanner {
 		keywordHMap.put("int", TokenType.INT_KW);
 
 		// DEBUG
-		// for (String kw :
-		// keywordHMap.keySet()) {
+		// for (String kw : keywordHMap.keySet())
 		// System.out.println("keyword: " + kw + "\tToken type: " +
 		// keywordHMap.get(kw));
-		// }
 	}
 
 	/**
@@ -107,9 +102,14 @@ public class Scanner {
 	 * @throws FileNotFoundException errore se il percorso indicato non c'é il file
 	 */
 	public Scanner(String fileName) throws FileNotFoundException {
+		try {
 		this.buffer = new PushbackReader(new FileReader(fileName));
 		this.riga = 1;
+			this.log = null;
 		// inizializzare campi che non hanno inizializzazione
+		} catch (FileNotFoundException e) {
+			throw new FileNotFoundException("File nel percorso '" + fileName + "' non trovato");
+		}
 	}
 
 	public Token nextToken() {
