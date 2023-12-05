@@ -100,18 +100,26 @@ public class Scanner {
 		// }
 	}
 
+	/**
+	 * Costruttore dello Scanner
+	 * 
+	 * @param fileName percorso assoluto o dalla radice del progetto
+	 * @throws FileNotFoundException errore se il percorso indicato non c'é il file
+	 */
 	public Scanner(String fileName) throws FileNotFoundException {
-
 		this.buffer = new PushbackReader(new FileReader(fileName));
-		riga = 1;
+		this.riga = 1;
 		// inizializzare campi che non hanno inizializzazione
 	}
 
 	public Token nextToken() {
-
 		// nextChar contiene il prossimo carattere dell'input (non consumato).
-		char nextChar = peekChar(); // Catturate l'eccezione IOException e
-		// ritornate una LexicalException che la contiene
+		try {
+			char nextChar = peekChar(); // Catturate l'eccezione IOException e ritornate una LexicalException che la
+										// contiene
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
 		// Avanza nel buffer leggendo i carattere in skipChars
 		// incrementando riga se leggi '\n'.
@@ -121,7 +129,7 @@ public class Scanner {
 		// return scanId()
 		// che legge tutte le lettere minuscole e ritorna un Token ID o
 		// il Token associato Parola Chiave (per generare i Token per le
-		// parole chiave usate l'HaskMap di corrispondenza
+		// parole chiave usate l'HashMap di corrispondenza
 
 		// Se nextChar e' o in operators oppure
 		// ritorna il Token associato con l'operatore o il delimitatore
@@ -136,16 +144,29 @@ public class Scanner {
 		// eccezione lessicale dicendo la riga e il carattere che la hanno
 		// provocata.
 
+		return null;
 	}
 
 	// private Token scanNumber()
 
 	// private Token scanId()
 
+	/**
+	 * Read buffer consuming a character
+	 * 
+	 * @return character at first of queue
+	 * @throws IOException error about non-existing input file
+	 */
 	private char readChar() throws IOException {
 		return ((char) this.buffer.read());
 	}
 
+	/**
+	 * Read buffer without consume
+	 * 
+	 * @return character at first of queue
+	 * @throws IOException error about non-existing input file
+	 */
 	private char peekChar() throws IOException {
 		char c = (char) buffer.read();
 		buffer.unread(c);
