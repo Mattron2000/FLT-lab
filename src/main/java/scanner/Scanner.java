@@ -103,53 +103,60 @@ public class Scanner {
 	 */
 	public Scanner(String fileName) throws FileNotFoundException {
 		try {
-		this.buffer = new PushbackReader(new FileReader(fileName));
-		this.riga = 1;
+			this.buffer = new PushbackReader(new FileReader(fileName));
+			this.riga = 1;
 			this.log = null;
-		// inizializzare campi che non hanno inizializzazione
+			// inizializzare campi che non hanno inizializzazione
 		} catch (FileNotFoundException e) {
 			throw new FileNotFoundException("File nel percorso '" + fileName + "' non trovato");
 		}
 	}
 
-	public Token nextToken() {
-		// nextChar contiene il prossimo carattere dell'input (non consumato).
-		try {
-			char nextChar = peekChar(); // Catturate l'eccezione IOException e ritornate una LexicalException che la
-										// contiene
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public Token nextToken() throws IOException, LexicalException {
+		Character c = readChar();
 
 		// Avanza nel buffer leggendo i carattere in skipChars
 		// incrementando riga se leggi '\n'.
 		// Se raggiungi la fine del file ritorna il Token EOF
+		while (skipChars.contains(c)) {
+			if (c == '\n')
+				this.riga++;
+			c = readChar();
+		}
 
-		// Se nextChar e' in letters
-		// return scanId()
-		// che legge tutte le lettere minuscole e ritorna un Token ID o
-		// il Token associato Parola Chiave (per generare i Token per le
-		// parole chiave usate l'HashMap di corrispondenza
+		// check that `c` is EOF
+		if (c == -1)
+			return new Token(TokenType.EOF, this.riga);
 
-		// Se nextChar e' o in operators oppure
-		// ritorna il Token associato con l'operatore o il delimitatore
+		// Se nextChar é in letters, return scanId(), che legge tutte le lettere
+		// minuscole e ritorna un Token ID o il Token associato Parola Chiave (per
+		// generare i Token per le parole chiave usate l'HashMap di corrispondenza
+		if (letters.contains(c))
+			return scanId(c);
 
-		// Se nextChar e' in numbers
-		// return scanNumber()
-		// che legge sia un intero che un float e ritorna il Token INUM o FNUM
-		// i caratteri che leggete devono essere accumulati in una stringa
-		// che verra' assegnata al campo valore del Token
+		// Se nextChar e' o in operators oppure ritorna il Token associato con
+		// l'operatore o il delimitatore
+		if (charTypeHMap.containsKey(c))
+			return new Token(charTypeHMap.get(c), this.riga);
 
-		// Altrimenti il carattere NON E' UN CARATTERE LEGALE sollevate una
-		// eccezione lessicale dicendo la riga e il carattere che la hanno
-		// provocata.
+		// Se nextChar e' in numbers return scanNumber()che legge sia un intero che un
+		// float e ritorna il Token INUM o FNUM i caratteri che leggete devono essere
+		// accumulati in una stringa che verra' assegnata al campo valore del Token
+		if (digits.contains(c))
+			return scanNumber(c);
 
+		// Altrimenti il carattere NON E' UN CARATTERE LEGALE sollevate una eccezione
+		// lessicale dicendo la riga e il carattere che la hanno provocata.
+		throw new LexicalException("Il carattere '" + c + "' NON E' UN CARATTERE LEGALE");
+	}
+
+	private Token scanId(Character c) {
 		return null;
 	}
 
-	// private Token scanNumber()
-
-	// private Token scanId()
+	private Token scanNumber(Character c) {
+		return null;
+	}
 
 	/**
 	 * Read buffer consuming a character
