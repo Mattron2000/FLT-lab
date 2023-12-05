@@ -1,16 +1,34 @@
 package token;
 
 public enum TokenType {
+    // INT_VAL,
     FLOAT_VAL,
+    // CHAR_VAL,
+    // STRING_VAL,
     INT_KW,
     FLOAT_KW,
+    // CHAR_KW,
+    // STRING_KW,
     PRINT,
     PLUS,
     MINUS,
     MULT,
     DIVIDE,
+    // INCR,
+    // DECR,
     ASSIGN,
+    // PLUS_ASSIGN,
+    // MINUS_ASSIGN,
+    // MULT_ASSIGN,
+    // DIVIDE_ASSIGN,
     SEMICOLON,
     EOF,
-    ID
+    // IF,
+    // ELSE,
+    // WHILE,
+    // DO,
+    // FOR,
+    ID,
+    // COMMENT_LINE,
+    // COMMENT_BLOCK
 }
