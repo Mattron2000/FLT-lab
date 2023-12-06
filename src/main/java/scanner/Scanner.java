@@ -151,8 +151,22 @@ public class Scanner {
 		throw new LexicalException("Il carattere '" + c + "' NON E' UN CARATTERE LEGALE");
 	}
 
-	private Token scanId() {
-		return null;
+	private Token scanId() throws IOException, LexicalException {
+		StringBuilder sb = new StringBuilder();
+		Character c = null;
+		while (!skipChars.contains(peekChar())) {
+			c = readChar();
+			if (!letters.contains(c))
+				throw new LexicalException(
+						"Stavo leggendo un ID e sono arrivato a '" + sb.toString() + "' ma é capitato '" + c + "'");
+			sb.append(c);
+		}
+
+		for (String regex : keywordHMap.keySet())
+			if (sb.toString().matches(regex))
+				return new Token(keywordHMap.get(regex), riga);
+
+		return new Token(TokenType.ID, riga, sb.toString());
 	}
 
 	private Token scanNumber() {
