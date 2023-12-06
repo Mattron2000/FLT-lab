@@ -169,8 +169,45 @@ public class Scanner {
 		return new Token(TokenType.ID, riga, sb.toString());
 	}
 
-	private Token scanNumber() {
-		return null;
+	private Token scanNumber() throws IOException, LexicalException {
+		StringBuilder sb = new StringBuilder();
+		Character c;
+
+		while (!skipChars.contains(peekChar())) {
+			c = readChar();
+			if (digits.contains(c)) {
+				sb.append(c);
+				continue;
+			}
+			if (c.equals('.')) {
+				if (sb.length() == 0)
+					throw new LexicalException(
+							"Stai creando un valore float iniziando con il punto, devi mettere almeno una cifra intera.");
+				sb.append(c);
+				return new Token(TokenType.FLOAT_VAL, riga, sb.toString() + '.' + scanFloat(sb.toString()));
+			}
+			throw new LexicalException();
+		}
+
+		return new Token(TokenType.INT_VAL, riga, sb.toString());
+	}
+
+	private String scanFloat(String integerPart) throws IOException, LexicalException {
+		StringBuilder sb = new StringBuilder();
+		Character c;
+
+		while (!skipChars.contains(peekChar())) {
+			c = readChar();
+			if (digits.contains(c)) {
+				sb.append(c);
+				continue;
+			}
+			throw new LexicalException("Stavo leggendo un FLOAT_VAL e sono arrivato a '" + integerPart + sb.toString()
+					+ "' ma é capitato '" + c + "'");
+
+		}
+		
+		return sb.toString();
 	}
 
 	/**
