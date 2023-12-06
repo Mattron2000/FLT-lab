@@ -1,7 +1,7 @@
 package token;
 
 public enum TokenType {
-    // INT_VAL,
+    INT_VAL,
     FLOAT_VAL,
     // CHAR_VAL,
     // STRING_VAL,

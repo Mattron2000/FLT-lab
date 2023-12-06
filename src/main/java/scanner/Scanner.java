@@ -113,7 +113,7 @@ public class Scanner {
 	}
 
 	public Token nextToken() throws IOException, LexicalException {
-		Character c = readChar();
+		Character c = peekChar();
 
 		// Avanza nel buffer leggendo i carattere in skipChars
 		// incrementando riga se leggi '\n'.
@@ -121,7 +121,8 @@ public class Scanner {
 		while (skipChars.contains(c)) {
 			if (c == '\n')
 				this.riga++;
-			c = readChar();
+			readChar();
+			c = peekChar();
 		}
 
 		// check that `c` is EOF
@@ -132,29 +133,29 @@ public class Scanner {
 		// minuscole e ritorna un Token ID o il Token associato Parola Chiave (per
 		// generare i Token per le parole chiave usate l'HashMap di corrispondenza
 		if (letters.contains(c))
-			return scanId(c);
+			return scanId();
 
 		// Se nextChar e' o in operators oppure ritorna il Token associato con
 		// l'operatore o il delimitatore
 		if (charTypeHMap.containsKey(c))
-			return new Token(charTypeHMap.get(c), this.riga);
+			return new Token(charTypeHMap.get(readChar()), this.riga);
 
 		// Se nextChar e' in numbers return scanNumber()che legge sia un intero che un
 		// float e ritorna il Token INUM o FNUM i caratteri che leggete devono essere
 		// accumulati in una stringa che verra' assegnata al campo valore del Token
 		if (digits.contains(c))
-			return scanNumber(c);
+			return scanNumber();
 
 		// Altrimenti il carattere NON E' UN CARATTERE LEGALE sollevate una eccezione
 		// lessicale dicendo la riga e il carattere che la hanno provocata.
 		throw new LexicalException("Il carattere '" + c + "' NON E' UN CARATTERE LEGALE");
 	}
 
-	private Token scanId(Character c) {
+	private Token scanId() {
 		return null;
 	}
 
-	private Token scanNumber(Character c) {
+	private Token scanNumber() {
 		return null;
 	}
 
