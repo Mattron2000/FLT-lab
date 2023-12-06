@@ -1,9 +1,17 @@
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.junit.jupiter.api.Test;
 
+import scanner.LexicalException;
+import scanner.Scanner;
 import token.Token;
 import token.TokenType;
 
 class TestToken {
+
 	/**
 	 * Check toString() function that execute correctly
 	 */
@@ -35,4 +43,16 @@ class TestToken {
 				"<FLOAT_VAL, riga:3, valore:3.2>" +
 				"<SEMICOLON, riga:1>"));
 	}
+
+	@Test
+	void testEOF() throws FileNotFoundException, IOException, LexicalException {
+		String CurrentWorkingDirectoryOfJavaProject = System.getProperty("user.dir");
+
+		String t = new Scanner(CurrentWorkingDirectoryOfJavaProject + "/src/test/java/data/testScanner/testEOF.txt")
+				.nextToken().toString();
+
+		System.out.println(t);
+		assertEquals(t, "<EOF, riga:4>");
+	}
+
 }

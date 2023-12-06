@@ -16,7 +16,7 @@ public class Scanner {
 	final char EOF = (char) -1;
 	private int riga;
 	private PushbackReader buffer;
-	private String log;
+	// private String log;
 
 	/**
 	 * insieme caratteri di skip (include EOF) e inizializzazione
@@ -41,7 +41,7 @@ public class Scanner {
 		for (int i = (int) 'A'; i <= (int) 'Z'; i++)
 			letters.add((char) i);
 
-		// DEBUG
+		//// DEBUG
 		// for (Character c : letters)
 		// System.out.println(c);
 	}
@@ -55,7 +55,7 @@ public class Scanner {
 		for (int i = (int) '0'; i <= (int) '9'; i++)
 			digits.add((char) i);
 
-		// DEBUG
+		//// DEBUG
 		// for (Character c : digits)
 		// System.out.println(c);
 	}
@@ -100,19 +100,20 @@ public class Scanner {
 	 * 
 	 * @param fileName percorso assoluto o dalla radice del progetto
 	 * @throws FileNotFoundException errore se il percorso indicato non c'é il file
+	 * @throws LexicalException
 	 */
-	public Scanner(String fileName) throws FileNotFoundException {
+	public Scanner(String fileName) throws LexicalException {
 		try {
 			this.buffer = new PushbackReader(new FileReader(fileName));
 			this.riga = 1;
-			this.log = null;
+			// this.log = null;
 			// inizializzare campi che non hanno inizializzazione
 		} catch (FileNotFoundException e) {
-			throw new FileNotFoundException("File nel percorso '" + fileName + "' non trovato");
+			throw new LexicalException("File nel percorso '" + fileName + "' non trovato", e);
 		}
 	}
 
-	public Token nextToken() throws IOException, LexicalException {
+	public Token nextToken() throws LexicalException {
 		Character c = peekChar();
 
 		// Avanza nel buffer leggendo i carattere in skipChars
@@ -126,7 +127,7 @@ public class Scanner {
 		}
 
 		// check that `c` is EOF
-		if (c == -1)
+		if (c == (char) -1)
 			return new Token(TokenType.EOF, this.riga);
 
 		// Se nextChar é in letters, return scanId(), che legge tutte le lettere
@@ -151,7 +152,7 @@ public class Scanner {
 		throw new LexicalException("Il carattere '" + c + "' NON E' UN CARATTERE LEGALE");
 	}
 
-	private Token scanId() throws IOException, LexicalException {
+	private Token scanId() throws LexicalException {
 		StringBuilder sb = new StringBuilder();
 		Character c = null;
 		while (!skipChars.contains(peekChar())) {
@@ -169,7 +170,7 @@ public class Scanner {
 		return new Token(TokenType.ID, riga, sb.toString());
 	}
 
-	private Token scanNumber() throws IOException, LexicalException {
+	private Token scanNumber() throws LexicalException {
 		StringBuilder sb = new StringBuilder();
 		Character c;
 
@@ -192,7 +193,7 @@ public class Scanner {
 		return new Token(TokenType.INT_VAL, riga, sb.toString());
 	}
 
-	private String scanFloat(String integerPart) throws IOException, LexicalException {
+	private String scanFloat(String integerPart) throws LexicalException {
 		StringBuilder sb = new StringBuilder();
 		Character c;
 
@@ -206,7 +207,7 @@ public class Scanner {
 					+ "' ma é capitato '" + c + "'");
 
 		}
-		
+
 		return sb.toString();
 	}
 
@@ -214,21 +215,30 @@ public class Scanner {
 	 * Read buffer consuming a character
 	 * 
 	 * @return character at first of queue
-	 * @throws IOException error about non-existing input file
+	 * @throws LexicalException error about non-existing input file
 	 */
-	private char readChar() throws IOException {
-		return ((char) this.buffer.read());
+	private char readChar() throws LexicalException {
+		try {
+			return ((char) this.buffer.read());
+		} catch (IOException e) {
+			throw new LexicalException("Errore in readChar()...", e);
+		}
 	}
 
 	/**
 	 * Read buffer without consume
 	 * 
 	 * @return character at first of queue
-	 * @throws IOException error about non-existing input file
+	 * @throws LexicalException error about non-existing input file
 	 */
-	private char peekChar() throws IOException {
-		char c = (char) buffer.read();
-		buffer.unread(c);
+	private char peekChar() throws LexicalException {
+		char c;
+		try {
+			c = (char) buffer.read();
+			buffer.unread(c);
+		} catch (IOException e) {
+			throw new LexicalException("Errore in peekChar()...", e);
+		}
 		return c;
 	}
 }
