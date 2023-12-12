@@ -16,6 +16,7 @@ public class Scanner {
 	final char EOF = (char) -1;
 	private int riga;
 	private PushbackReader buffer;
+	private Token nextTk;
 	// private String log;
 
 	/**
@@ -104,11 +105,24 @@ public class Scanner {
 	public Scanner(String fileName) throws FileNotFoundException {
 		this.buffer = new PushbackReader(new FileReader(fileName));
 		this.riga = 1;
+		this.nextTk = null;
 		// this.log = null;
 		// inizializzare campi che non hanno inizializzazione
 	}
 
+	public Token peekToken() throws LexicalException {
+		if (this.nextTk == null)
+			this.nextTk = nextToken();
+		return nextTk;
+	}
+
 	public Token nextToken() throws LexicalException {
+		if (!(this.nextTk == null)){
+			Token tk = this.nextTk;
+			this.nextTk = null;
+			return tk;
+		}
+
 		Character c;
 		try {
 			c = peekChar();
@@ -218,7 +232,8 @@ public class Scanner {
 			if (c.equals('.')) {
 				if (sb.length() == 0)
 					throw new LexicalException(
-							"Stai creando un valore float iniziando con il punto, devi mettere almeno una cifra intera. RIGA " + riga );
+							"Stai creando un valore float iniziando con il punto, devi mettere almeno una cifra intera. RIGA "
+									+ riga);
 				sb.append(c);
 				return new Token(TokenType.FLOAT_VAL, riga, sb.toString() + '.' + scanFloat(sb.toString()));
 			}
