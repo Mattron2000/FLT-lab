@@ -100,21 +100,21 @@ public class Scanner {
 	 * 
 	 * @param fileName percorso assoluto o dalla radice del progetto
 	 * @throws FileNotFoundException errore se il percorso indicato non c'é il file
-	 * @throws LexicalException
 	 */
-	public Scanner(String fileName) throws LexicalException {
-		try {
-			this.buffer = new PushbackReader(new FileReader(fileName));
-			this.riga = 1;
-			// this.log = null;
-			// inizializzare campi che non hanno inizializzazione
-		} catch (FileNotFoundException e) {
-			throw new LexicalException("File nel percorso '" + fileName + "' non trovato", e);
-		}
+	public Scanner(String fileName) throws FileNotFoundException {
+		this.buffer = new PushbackReader(new FileReader(fileName));
+		this.riga = 1;
+		// this.log = null;
+		// inizializzare campi che non hanno inizializzazione
 	}
 
 	public Token nextToken() throws LexicalException {
-		Character c = peekChar();
+		Character c;
+		try {
+			c = peekChar();
+		} catch (IOException e) {
+			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
+		}
 
 		// Avanza nel buffer leggendo i carattere in skipChars
 		// incrementando riga se leggi '\n'.
@@ -122,8 +122,16 @@ public class Scanner {
 		while (skipChars.contains(c)) {
 			if (c == '\n')
 				this.riga++;
-			readChar();
-			c = peekChar();
+			try {
+				readChar();
+			} catch (IOException e) {
+				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
+			}
+			try {
+				c = peekChar();
+			} catch (IOException e) {
+				throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
+			}
 		}
 
 		// check that `c` is EOF
@@ -139,7 +147,11 @@ public class Scanner {
 		// Se nextChar e' o in operators oppure ritorna il Token associato con
 		// l'operatore o il delimitatore
 		if (charTypeHMap.containsKey(c))
-			return new Token(charTypeHMap.get(readChar()), this.riga);
+			try {
+				return new Token(charTypeHMap.get(readChar()), this.riga);
+			} catch (IOException e) {
+				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
+			}
 
 		// Se nextChar e' in numbers return scanNumber()che legge sia un intero che un
 		// float e ritorna il Token INUM o FNUM i caratteri che leggete devono essere
@@ -154,13 +166,27 @@ public class Scanner {
 
 	private Token scanId() throws LexicalException {
 		StringBuilder sb = new StringBuilder();
-		Character c = null;
-		while (!skipChars.contains(peekChar())) {
-			c = readChar();
+		Character c;
+		try {
+			c = peekChar();
+		} catch (IOException e) {
+			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
+		}
+		while (!skipChars.contains(c)) {
+			try {
+				c = readChar();
+			} catch (IOException e) {
+				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
+			}
 			if (!letters.contains(c))
 				throw new LexicalException(
 						"Stavo leggendo un ID e sono arrivato a '" + sb.toString() + "' ma é capitato '" + c + "'");
 			sb.append(c);
+			try {
+				c = peekChar();
+			} catch (IOException e) {
+				throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
+			}
 		}
 
 		for (String regex : keywordHMap.keySet())
@@ -173,9 +199,18 @@ public class Scanner {
 	private Token scanNumber() throws LexicalException {
 		StringBuilder sb = new StringBuilder();
 		Character c;
+		try {
+			c = peekChar();
+		} catch (IOException e) {
+			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
+		}
 
-		while (!skipChars.contains(peekChar())) {
-			c = readChar();
+		while (!skipChars.contains(c)) {
+			try {
+				c = readChar();
+			} catch (IOException e) {
+				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
+			}
 			if (digits.contains(c)) {
 				sb.append(c);
 				continue;
@@ -183,11 +218,11 @@ public class Scanner {
 			if (c.equals('.')) {
 				if (sb.length() == 0)
 					throw new LexicalException(
-							"Stai creando un valore float iniziando con il punto, devi mettere almeno una cifra intera.");
+							"Stai creando un valore float iniziando con il punto, devi mettere almeno una cifra intera. RIGA " + riga );
 				sb.append(c);
 				return new Token(TokenType.FLOAT_VAL, riga, sb.toString() + '.' + scanFloat(sb.toString()));
 			}
-			throw new LexicalException();
+			throw new LexicalException("Errore in scanNumber() alla riga " + riga);
 		}
 
 		return new Token(TokenType.INT_VAL, riga, sb.toString());
@@ -196,9 +231,18 @@ public class Scanner {
 	private String scanFloat(String integerPart) throws LexicalException {
 		StringBuilder sb = new StringBuilder();
 		Character c;
+		try {
+			c = peekChar();
+		} catch (IOException e) {
+			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
+		}
 
-		while (!skipChars.contains(peekChar())) {
-			c = readChar();
+		while (!skipChars.contains(c)) {
+			try {
+				c = readChar();
+			} catch (IOException e) {
+				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
+			}
 			if (digits.contains(c)) {
 				sb.append(c);
 				continue;
@@ -215,30 +259,22 @@ public class Scanner {
 	 * Read buffer consuming a character
 	 * 
 	 * @return character at first of queue
-	 * @throws LexicalException error about non-existing input file
+	 * @throws IOException error about non-existing input file
 	 */
-	private char readChar() throws LexicalException {
-		try {
-			return ((char) this.buffer.read());
-		} catch (IOException e) {
-			throw new LexicalException("Errore in readChar()...", e);
-		}
+	private char readChar() throws IOException {
+		return ((char) this.buffer.read());
 	}
 
 	/**
 	 * Read buffer without consume
 	 * 
 	 * @return character at first of queue
-	 * @throws LexicalException error about non-existing input file
+	 * @throws IOException error about non-existing input file
 	 */
-	private char peekChar() throws LexicalException {
-		char c;
-		try {
-			c = (char) buffer.read();
-			buffer.unread(c);
-		} catch (IOException e) {
-			throw new LexicalException("Errore in peekChar()...", e);
-		}
+	private char peekChar() throws IOException {
+		char c = (char) buffer.read();
+		buffer.unread(c);
+
 		return c;
 	}
 }
