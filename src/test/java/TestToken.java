@@ -1,7 +1,6 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +10,8 @@ import token.Token;
 import token.TokenType;
 
 class TestToken {
+
+	private static final String CurrentWorkingDirectoryOfJavaProject = System.getProperty("user.dir");;
 
 	/**
 	 * Check toString() function that execute correctly
@@ -45,14 +46,25 @@ class TestToken {
 	}
 
 	@Test
-	void testEOF() throws FileNotFoundException, IOException, LexicalException {
-		String CurrentWorkingDirectoryOfJavaProject = System.getProperty("user.dir");
-
+	void testEOF() throws LexicalException, FileNotFoundException {
 		String t = new Scanner(CurrentWorkingDirectoryOfJavaProject + "/src/test/java/data/testScanner/testEOF.txt")
 				.nextToken().toString();
 
 		System.out.println(t);
 		assertEquals(t, "<EOF, riga:4>");
+	}
+
+	@Test
+	void testPeekToken() throws LexicalException, FileNotFoundException {
+		Scanner s = new Scanner( CurrentWorkingDirectoryOfJavaProject + "/src/test/java/data/testScanner/testGenerale.txt");
+		assertEquals(s.peekToken().getTipo(), TokenType.INT_KW);
+		assertEquals(s.nextToken().getTipo(), TokenType.INT_KW);
+		assertEquals(s.peekToken().getTipo(), TokenType.ID);
+		assertEquals(s.peekToken().getTipo(), TokenType.ID);
+		Token t = s.nextToken();
+		assertEquals(t.getTipo(), TokenType.ID);
+		assertEquals(t.getRiga(), 1);
+		assertEquals(t.getValore(), "temp");
 	}
 
 }

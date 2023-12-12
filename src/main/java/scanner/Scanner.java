@@ -181,27 +181,30 @@ public class Scanner {
 	private Token scanId() throws LexicalException {
 		StringBuilder sb = new StringBuilder();
 		Character c;
-		try {
-			c = peekChar();
-		} catch (IOException e) {
-			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
-		}
-		while (!skipChars.contains(c)) {
+
+		do {
 			try {
-				c = readChar();
+				c = peekChar();
 			} catch (IOException e) {
 				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
 			}
+
+			if(charTypeHMap.get(c) == TokenType.SEMICOLON)
+				break;
+
+			if(skipChars.contains(c))
+				break;
+
 			if (!letters.contains(c))
 				throw new LexicalException(
 						"Stavo leggendo un ID e sono arrivato a '" + sb.toString() + "' ma é capitato '" + c + "'");
 			sb.append(c);
 			try {
-				c = peekChar();
+				c = readChar();
 			} catch (IOException e) {
-				throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
+				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
 			}
-		}
+		} while (!skipChars.contains(c));
 
 		for (String regex : keywordHMap.keySet())
 			if (sb.toString().matches(regex))
