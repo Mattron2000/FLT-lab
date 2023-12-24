@@ -4,23 +4,21 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PushbackReader;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import token.Token;
 import token.TokenType;
 
-// import token.*;
-
 public class Scanner {
 	final char EOF = (char) -1;
-	private int riga;
+	private int riga = 1;
 	private PushbackReader buffer;
-	private Token nextTk;
-	// private String log;
+	private Token nextTk = null;
 
 	/**
-	 * insieme caratteri di skip (include EOF) e inizializzazione
+	 * insieme caratteri di skip (incluso EOF) e inizializzazione
 	 */
 	private static final ArrayList<Character> skipChars;
 	static {
@@ -32,7 +30,7 @@ public class Scanner {
 	}
 
 	/**
-	 * insieme lettere e inizializzazione
+	 * lettere alfanumeriche minuscole e maiuscole
 	 */
 	private static final ArrayList<Character> letters;
 	static {
@@ -48,7 +46,7 @@ public class Scanner {
 	}
 
 	/**
-	 * cifre e inizializzazione
+	 * cifre numeriche
 	 */
 	private static final ArrayList<Character> digits;
 	static {
@@ -62,18 +60,23 @@ public class Scanner {
 	}
 
 	/**
-	 * mapping fra caratteri '+', '-', '*', '/', ';', '=' e il TokenType
-	 * corrispondente
+	 * associo i simboli di operazione +,-,*,\,...,; con il TokenType corrispondente
 	 */
-	private static final HashMap<Character, TokenType> charTypeHMap;
+	private static final HashMap<String, TokenType> charTypeHMap;
 	static {
 		charTypeHMap = new HashMap<>();
-		charTypeHMap.put('+', TokenType.PLUS);
-		charTypeHMap.put('-', TokenType.MINUS);
-		charTypeHMap.put('*', TokenType.MULT);
-		charTypeHMap.put('/', TokenType.DIVIDE);
-		charTypeHMap.put(';', TokenType.SEMICOLON);
-		charTypeHMap.put('=', TokenType.ASSIGN);
+		charTypeHMap.put("+", TokenType.PLUS);
+		charTypeHMap.put("-", TokenType.MINUS);
+		charTypeHMap.put("*", TokenType.MULT);
+		charTypeHMap.put("/", TokenType.DIVIDE);
+		charTypeHMap.put(";", TokenType.SEMICOLON);
+		charTypeHMap.put("=", TokenType.ASSIGN);
+		charTypeHMap.put("+=", TokenType.PLUS_ASSIGN);
+		charTypeHMap.put("-=", TokenType.MINUS_ASSIGN);
+		charTypeHMap.put("*=", TokenType.MULT_ASSIGN);
+		charTypeHMap.put("/=", TokenType.DIVIDE_ASSIGN);
+		charTypeHMap.put("++", TokenType.INCREMENT);
+		charTypeHMap.put("--", TokenType.DECREMENT);
 
 		// DEBUG
 		// for (Character c : charTypeHMap.keySet())
@@ -81,7 +84,7 @@ public class Scanner {
 	}
 
 	/**
-	 * mapping fra le stringhe "print", "float", "int" e il TokenType corrispondente
+	 * associo le keyword con il TokenType corrispondente
 	 */
 	private static final HashMap<String, TokenType> keywordHMap;
 	static {
@@ -99,15 +102,12 @@ public class Scanner {
 	/**
 	 * Costruttore dello Scanner
 	 * 
-	 * @param fileName percorso assoluto o dalla radice del progetto
-	 * @throws FileNotFoundException errore se il percorso indicato non c'é il file
+	 * @param fileName percorso assoluto del file di testo da scannerizzare
+	 * @throws FileNotFoundException errore se il percorso indicato non c'é il
+	 *                               file.txt
 	 */
 	public Scanner(String fileName) throws FileNotFoundException {
 		this.buffer = new PushbackReader(new FileReader(fileName));
-		this.riga = 1;
-		this.nextTk = null;
-		// this.log = null;
-		// inizializzare campi che non hanno inizializzazione
 	}
 
 	public Token peekToken() throws LexicalException {
@@ -117,136 +117,175 @@ public class Scanner {
 	}
 
 	public Token nextToken() throws LexicalException {
-		if (!(this.nextTk == null)){
+		if (this.nextTk != null) {
 			Token tk = this.nextTk;
 			this.nextTk = null;
 			return tk;
 		}
 
-		Character c;
+		Character c = null;
 		try {
 			c = peekChar();
 		} catch (IOException e) {
 			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
 		}
 
-		// Avanza nel buffer leggendo i carattere in skipChars
-		// incrementando riga se leggi '\n'.
-		// Se raggiungi la fine del file ritorna il Token EOF
+		// Avanza nel buffer scatando i caratteri in skipChars, incrementando riga se
+		// legge '\n'.
 		while (skipChars.contains(c)) {
 			if (c == '\n')
 				this.riga++;
 			try {
-				readChar();
+				c = readAndPeekChar();
 			} catch (IOException e) {
-				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
-			}
-			try {
-				c = peekChar();
-			} catch (IOException e) {
-				throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
+				throw new LexicalException("Non funziona readAndPeekChar() alla riga " + riga, e);
 			}
 		}
 
-		// check that `c` is EOF
+		// Se ha raggiunto la fine del file ritorna il Token EOF
 		if (c == (char) -1)
 			return new Token(TokenType.EOF, this.riga);
 
-		// Se nextChar é in letters, return scanId(), che legge tutte le lettere
-		// minuscole e ritorna un Token ID o il Token associato Parola Chiave (per
-		// generare i Token per le parole chiave usate l'HashMap di corrispondenza
+		// Se `c` é una lettere alfabetica, allora é una KEYWORD o ID
 		if (letters.contains(c))
 			return scanId();
 
-		// Se nextChar e' o in operators oppure ritorna il Token associato con
-		// l'operatore o il delimitatore
-		if (charTypeHMap.containsKey(c))
-			try {
-				return new Token(charTypeHMap.get(readChar()), this.riga);
-			} catch (IOException e) {
-				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
-			}
+		// Se `c` é presente in charTypeHMap, allora é un operatore o un delimitatore
+		if (charTypeHMap.containsKey(c.toString()))
+			return scanOp();
 
-		// Se nextChar e' in numbers return scanNumber()che legge sia un intero che un
-		// float e ritorna il Token INUM o FNUM i caratteri che leggete devono essere
-		// accumulati in una stringa che verra' assegnata al campo valore del Token
+		// Se `c` é una cifra numerica, allora é INT_VAL o FLOAT_VAL
 		if (digits.contains(c))
 			return scanNumber();
 
-		// Altrimenti il carattere NON E' UN CARATTERE LEGALE sollevate una eccezione
-		// lessicale dicendo la riga e il carattere che la hanno provocata.
-		throw new LexicalException("Il carattere '" + c + "' NON E' UN CARATTERE LEGALE");
+		/*
+		 * Altrimenti il carattere NON É UN CARATTERE LEGALE, bisogna sollevare
+		 * un'eccezione lessicale
+		 */
+		throw new LexicalException("Il carattere '" + c + "' NON É UN CARATTERE LEGALE");
 	}
 
+	/**
+	 * 
+	 * @return un Token di tipo OPERATOR (SUM, MINUS, ...) o SEMICOLON
+	 * @throws LexicalException ci sono caratteri non appartenenti a charTypeHMap
+	 */
+	private Token scanOp() throws LexicalException {
+		Character fc, sc; // First Char, Second Char;
+
+		try {
+			fc = readChar();
+		} catch (IOException e) {
+			throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
+		}
+
+		try {
+			sc = peekChar();
+		} catch (IOException e) {
+			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
+		}
+
+		String s = fc.toString() + sc.toString();
+		if (charTypeHMap.containsKey(s)) {
+			try {
+				sc = readChar();
+			} catch (IOException e) {
+				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
+			}
+		} else
+			s = fc.toString();
+
+		return new Token(charTypeHMap.get(s), riga);
+	}
+
+	/**
+	 * che legge tutte le lettere minuscole e maiuscole e cifre numeriche
+	 * 
+	 * @return un Token ID o il Token associato KEYWORD
+	 * @throws LexicalException ci sono caratteri che non ci devono essere in un
+	 *                          ID/KEYWORD
+	 */
 	private Token scanId() throws LexicalException {
 		StringBuilder sb = new StringBuilder();
 		Character c;
 
-		do {
-			try {
-				c = peekChar();
-			} catch (IOException e) {
-				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
-			}
+		try {
+			c = peekChar();
+		} catch (IOException e) {
+			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
+		}
 
-			if(charTypeHMap.get(c) == TokenType.SEMICOLON)
-				break;
-
-			if(skipChars.contains(c))
-				break;
-
-			if (!letters.contains(c))
-				throw new LexicalException(
-						"Stavo leggendo un ID e sono arrivato a '" + sb.toString() + "' ma é capitato '" + c + "'");
+		while (letters.contains(c)) {
 			sb.append(c);
 			try {
-				c = readChar();
+				c = readAndPeekChar();
 			} catch (IOException e) {
-				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
+				throw new LexicalException("Non funziona readAndPeekChar() alla riga " + riga, e);
 			}
-		} while (!skipChars.contains(c));
+		}
 
-		for (String regex : keywordHMap.keySet())
-			if (sb.toString().matches(regex))
-				return new Token(keywordHMap.get(regex), riga);
+		TokenType tt = keywordHMap.get(sb.toString());
 
-		return new Token(TokenType.ID, riga, sb.toString());
+		if (tt != null)
+			return new Token(tt, riga);
+		else
+			return new Token(TokenType.ID, riga, sb.toString());
 	}
 
+	/**
+	 * legge sia un intero che un float
+	 * 
+	 * @return un Token INT_VAL o FLOAT_VAL
+	 * @throws LexicalException ci sono caratteri al di fuori di quelle numeriche e
+	 *                          il .
+	 */
 	private Token scanNumber() throws LexicalException {
 		StringBuilder sb = new StringBuilder();
 		Character c;
+
 		try {
 			c = peekChar();
 		} catch (IOException e) {
 			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
 		}
 
-		while (!skipChars.contains(c)) {
+		while (digits.contains(c)) {
+			sb.append(c);
+			try {
+				c = readAndPeekChar();
+			} catch (IOException e) {
+				throw new LexicalException("Non funziona readAndPeekChar() alla riga " + riga, e);
+			}
+		}
+
+		if (c.equals('.')) {
 			try {
 				c = readChar();
 			} catch (IOException e) {
 				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
 			}
-			if (digits.contains(c)) {
-				sb.append(c);
-				continue;
-			}
-			if (c.equals('.')) {
-				if (sb.length() == 0)
-					throw new LexicalException(
-							"Stai creando un valore float iniziando con il punto, devi mettere almeno una cifra intera. RIGA "
-									+ riga);
-				sb.append(c);
-				return new Token(TokenType.FLOAT_VAL, riga, sb.toString() + '.' + scanFloat(sb.toString()));
-			}
-			throw new LexicalException("Errore in scanNumber() alla riga " + riga);
+
+			if (sb.length() == 0)
+				return new Token(TokenType.FLOAT_VAL, riga, "0.0");
+			else
+				return new Token(TokenType.FLOAT_VAL, riga,
+						formatNumber(sb).toString() + "." + scanFloat(sb).toString());
 		}
 
-		return new Token(TokenType.INT_VAL, riga, sb.toString());
+		if (skipChars.contains(c) || charTypeHMap.containsKey(c.toString()))
+			return new Token(TokenType.INT_VAL, riga, formatNumber(sb).toString());
+
+		throw new LexicalException("Errore in scanNumber() alla riga " + riga + ", sono arrivato a '" + sb.toString()
+				+ "' ma ho trovato '" + c + "'");
 	}
 
-	private String scanFloat(String integerPart) throws LexicalException {
+	/**
+	 * 
+	 * @param integerPart
+	 * @return
+	 * @throws LexicalException
+	 */
+	private StringBuilder scanFloat(StringBuilder integerPart) throws LexicalException {
 		StringBuilder sb = new StringBuilder();
 		Character c;
 		try {
@@ -255,22 +294,38 @@ public class Scanner {
 			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
 		}
 
-		while (!skipChars.contains(c)) {
+		while (digits.contains(c)) {
+			sb.append(c);
 			try {
-				c = readChar();
+				c = readAndPeekChar();
 			} catch (IOException e) {
-				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
+				throw new LexicalException("Non funziona readAndPeekChar() alla riga " + riga, e);
 			}
-			if (digits.contains(c)) {
-				sb.append(c);
-				continue;
-			}
-			throw new LexicalException("Stavo leggendo un FLOAT_VAL e sono arrivato a '" + integerPart + sb.toString()
-					+ "' ma é capitato '" + c + "'");
-
 		}
 
-		return sb.toString();
+		if (letters.contains(c))
+			throw new LexicalException("Errore in scanNumber() alla riga " + riga + ", sono arrivato a '"
+					+ integerPart.toString() + '.' + sb.toString()
+					+ "' ma ho trovato '" + c + "'");
+
+		return formatNumber(sb);
+	}
+
+	private StringBuilder formatNumber(StringBuilder sb) {
+		if (sb == null)
+			throw new IllegalArgumentException("L'argomento 'sb' dev'essere diverso da null");
+
+		String s = sb.toString();
+		if (s.equals(""))
+			return sb.append("0");
+
+		if (s.equals("0"))
+			return sb;
+
+		while (sb.toString().length() > 1 && sb.toString().charAt(0) == '0')
+			sb = new StringBuilder(sb.substring(1));
+
+		return sb;
 	}
 
 	/**
@@ -294,5 +349,10 @@ public class Scanner {
 		buffer.unread(c);
 
 		return c;
+	}
+
+	private char readAndPeekChar() throws IOException {
+		readChar();
+		return peekChar();
 	}
 }
