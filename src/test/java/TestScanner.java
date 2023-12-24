@@ -11,7 +11,8 @@ import token.TokenType;
 
 class TestScanner {
 
-	private static final String RootFolderOfJavaProject = System.getProperty("user.dir");;
+	private static final String testScannerFolder = System.getProperty("user.dir")
+			+ "/src/test/java/data/testScanner/";
 
 	/**
 	 * Check toString() function, that Token class have, execute correctly
@@ -47,7 +48,7 @@ class TestScanner {
 
 	@Test
 	void testEOF() throws LexicalException, FileNotFoundException {
-		Scanner s = new Scanner(RootFolderOfJavaProject + "/src/test/java/data/testScanner/testEOF.txt");
+		Scanner s = new Scanner(testScannerFolder + "testEOF.txt");
 		Token t = s.nextToken();
 
 		assertEquals(4, t.getRiga());
@@ -63,7 +64,7 @@ class TestScanner {
 
 	@Test
 	void testFloat() throws LexicalException, FileNotFoundException {
-		Scanner s = new Scanner(RootFolderOfJavaProject + "/src/test/java/data/testScanner/testFLOAT.txt");
+		Scanner s = new Scanner(testScannerFolder + "testFLOAT.txt");
 		Token t = s.nextToken();
 
 		assertEquals(1, t.getRiga());
@@ -93,7 +94,7 @@ class TestScanner {
 
 	@Test
 	void testGenerale() throws LexicalException, FileNotFoundException {
-		Scanner s = new Scanner(RootFolderOfJavaProject + "/src/test/java/data/testScanner/testGenerale.txt");
+		Scanner s = new Scanner(testScannerFolder + "testGenerale.txt");
 		Token t = s.nextToken();
 
 		assertEquals(t.getTipo(), TokenType.INT_KW);
@@ -198,7 +199,7 @@ class TestScanner {
 
 	@Test
 	void testId() throws LexicalException, FileNotFoundException {
-		Scanner s = new Scanner(RootFolderOfJavaProject + "/src/test/java/data/testScanner/testId.txt");
+		Scanner s = new Scanner(testScannerFolder + "testId.txt");
 		Token t = s.nextToken();
 
 		assertEquals(t.getRiga(), 1);
@@ -227,7 +228,7 @@ class TestScanner {
 
 	@Test
 	void testIdKeywords() throws LexicalException, FileNotFoundException {
-		Scanner s = new Scanner(RootFolderOfJavaProject + "/src/test/java/data/testScanner/testIdKeyWords.txt");
+		Scanner s = new Scanner(testScannerFolder + "testIdKeyWords.txt");
 		Token t = s.nextToken();
 
 		assertEquals(1, t.getRiga());
@@ -277,7 +278,7 @@ class TestScanner {
 
 	@Test
 	void testInt() throws LexicalException, FileNotFoundException {
-		Scanner s = new Scanner(RootFolderOfJavaProject + "/src/test/java/data/testScanner/testINT.txt");
+		Scanner s = new Scanner(testScannerFolder + "testINT.txt");
 		Token t = s.nextToken();
 
 		assertEquals(t.getRiga(), 2);
@@ -302,7 +303,7 @@ class TestScanner {
 
 	@Test
 	void testKeywords() throws LexicalException, FileNotFoundException {
-		Scanner s = new Scanner(RootFolderOfJavaProject + "/src/test/java/data/testScanner/testKeywords.txt");
+		Scanner s = new Scanner(testScannerFolder + "testKeywords.txt");
 		Token t = s.nextToken();
 
 		assertEquals(t.getRiga(), 2);
@@ -327,7 +328,7 @@ class TestScanner {
 
 	@Test
 	void testOperators() throws LexicalException, FileNotFoundException {
-		Scanner s = new Scanner(RootFolderOfJavaProject + "/src/test/java/data/testScanner/testOperators.txt");
+		Scanner s = new Scanner(testScannerFolder + "testOperators.txt");
 		Token t = s.nextToken();
 
 		assertEquals(t.getRiga(), 1);
@@ -397,7 +398,7 @@ class TestScanner {
 
 	@Test
 	void testErroriID() throws LexicalException, FileNotFoundException {
-		Scanner s = new Scanner(RootFolderOfJavaProject + "/src/test/java/data/testScanner/erroriID");
+		Scanner s = new Scanner(testScannerFolder + "erroriID");
 		Token t = s.nextToken();
 
 		assertEquals(t.getRiga(), 1);
@@ -407,25 +408,12 @@ class TestScanner {
 
 	@Test
 	void testErroriNumbers() throws LexicalException, FileNotFoundException {
-		// Scanner s1 = new Scanner(
-		// RootFolderOfJavaProject +
-		// "/src/test/java/data/testScanner/erroriNumbers/erroriNumbers1.txt");
-		// Scanner s2 = new Scanner(
-		// RootFolderOfJavaProject +
-		// "/src/test/java/data/testScanner/erroriNumbers/erroriNumbers2.txt");
-		// Scanner s3 = new Scanner(
-		// RootFolderOfJavaProject +
-		// "/src/test/java/data/testScanner/erroriNumbers/erroriNumbers3.txt");
-		// Scanner s4 = new Scanner(
-		// RootFolderOfJavaProject +
-		// "/src/test/java/data/testScanner/erroriNumbers/erroriNumbers4.txt");
-
 		Scanner s = null;
 		Token t = null;
 
-		for (int i = 1; i <+ 4; i++) {
+		for (int i = 1; i < +4; i++) {
 			s = new Scanner(
-					RootFolderOfJavaProject + "/src/test/java/data/testScanner/erroriNumbers/erroriNumbers" + i
+					testScannerFolder + "erroriNumbers/erroriNumbers" + i
 							+ ".txt");
 
 			switch (i) {
