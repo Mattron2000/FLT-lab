@@ -1,0 +1,11 @@
+testParserCorretto1.txt,    testCorretto1
+testParserCorretto2.txt,    testCorretto2
+testParserEcc_0.txt,        testEcc0
+testParserEcc_1.txt,        testEcc1
+testParserEcc_2.txt,        testEcc2
+testParserEcc_3.txt,        testEcc3
+testParserEcc_4.txt,        testEcc4
+testParserEcc_5.txt,        testEcc5
+testParserEcc_6.txt,        testEcc6
+testParserEcc_7.txt,        testEcc7
+testSoloDichPrint1.txt,     testSoloDich
