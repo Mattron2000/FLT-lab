@@ -110,13 +110,13 @@ public class Scanner {
 		this.buffer = new PushbackReader(new FileReader(fileName));
 	}
 
-	public Token peekToken() throws LexicalException {
+	public Token peekToken() throws LexicalException, IOException {
 		if (this.nextTk == null)
 			this.nextTk = nextToken();
 		return nextTk;
 	}
 
-	public Token nextToken() throws LexicalException {
+	public Token nextToken() throws LexicalException, IOException {
 		if (this.nextTk != null) {
 			Token tk = this.nextTk;
 			this.nextTk = null;
@@ -124,22 +124,15 @@ public class Scanner {
 		}
 
 		Character c = null;
-		try {
-			c = peekChar();
-		} catch (IOException e) {
-			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
-		}
+		c = peekChar();
 
 		// Avanza nel buffer scatando i caratteri in skipChars, incrementando riga se
 		// legge '\n'.
 		while (skipChars.contains(c)) {
 			if (c == '\n')
 				this.riga++;
-			try {
-				c = readAndPeekChar();
-			} catch (IOException e) {
-				throw new LexicalException("Non funziona readAndPeekChar() alla riga " + riga, e);
-			}
+			readChar();
+			c = peekChar();
 		}
 
 		// Se ha raggiunto la fine del file ritorna il Token EOF
@@ -155,7 +148,7 @@ public class Scanner {
 			return scanOp();
 
 		// Se `c` é una cifra numerica, allora é INT_VAL o FLOAT_VAL
-		if (digits.contains(c))
+		if (digits.contains(c) || c == '.')
 			return scanNumber();
 
 		/*
@@ -169,29 +162,18 @@ public class Scanner {
 	 * 
 	 * @return un Token di tipo OPERATOR (SUM, MINUS, ...) o SEMICOLON
 	 * @throws LexicalException ci sono caratteri non appartenenti a charTypeHMap
+	 * @throws IOException
 	 */
-	private Token scanOp() throws LexicalException {
+	private Token scanOp() throws LexicalException, IOException {
 		Character fc, sc; // First Char, Second Char;
 
-		try {
-			fc = readChar();
-		} catch (IOException e) {
-			throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
-		}
+		fc = readChar();
 
-		try {
-			sc = peekChar();
-		} catch (IOException e) {
-			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
-		}
+		sc = peekChar();
 
 		String s = fc.toString() + sc.toString();
 		if (charTypeHMap.containsKey(s)) {
-			try {
-				sc = readChar();
-			} catch (IOException e) {
-				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
-			}
+			sc = readChar();
 		} else
 			s = fc.toString();
 
@@ -204,25 +186,19 @@ public class Scanner {
 	 * @return un Token ID o il Token associato KEYWORD
 	 * @throws LexicalException ci sono caratteri che non ci devono essere in un
 	 *                          ID/KEYWORD
+	 * @throws IOException
 	 */
-	private Token scanId() throws LexicalException {
+	private Token scanId() throws LexicalException, IOException {
 		StringBuilder sb = new StringBuilder();
 		Character c;
 
-		try {
-			c = peekChar();
-		} catch (IOException e) {
-			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
-		}
+		c = peekChar();
 
-		while (letters.contains(c)) {
+		do {
 			sb.append(c);
-			try {
-				c = readAndPeekChar();
-			} catch (IOException e) {
-				throw new LexicalException("Non funziona readAndPeekChar() alla riga " + riga, e);
-			}
-		}
+			readChar();
+			c = peekChar();
+		} while (letters.contains(c) || digits.contains(c));
 
 		TokenType tt = keywordHMap.get(sb.toString());
 
@@ -236,44 +212,35 @@ public class Scanner {
 	 * legge sia un intero che un float
 	 * 
 	 * @return un Token INT_VAL o FLOAT_VAL
-	 * @throws LexicalException ci sono caratteri al di fuori di quelle numeriche e
-	 *                          il .
+	 * @throws LexicalException ci sono caratteri al di fuori di quelle numeriche
+	 *                          e/o il '.'
+	 * @throws IOException
 	 */
-	private Token scanNumber() throws LexicalException {
+	private Token scanNumber() throws LexicalException, IOException {
 		StringBuilder sb = new StringBuilder();
 		Character c;
 
-		try {
-			c = peekChar();
-		} catch (IOException e) {
-			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
-		}
+		c = peekChar();
 
-		while (digits.contains(c)) {
+		if (c == '.')
+			throw new LexicalException("Non puoi creare un numero iniziando con il punto");
+
+		do {
 			sb.append(c);
-			try {
-				c = readAndPeekChar();
-			} catch (IOException e) {
-				throw new LexicalException("Non funziona readAndPeekChar() alla riga " + riga, e);
-			}
-		}
+			readChar();
+			c = peekChar();
+		} while (digits.contains(c));
+
+		if (sb.charAt(0) == '0' && sb.length() > 1)
+			throw new LexicalException("Errore in scanNumber() alla riga " + riga
+					+ ", non puoi creare un numero intero iniziando con la cifra zero");
 
 		if (c.equals('.')) {
-			try {
-				c = readChar();
-			} catch (IOException e) {
-				throw new LexicalException("Non funziona readChar() alla riga " + riga, e);
-			}
-
-			if (sb.length() == 0)
-				return new Token(TokenType.FLOAT_VAL, riga, "0.0");
-			else
-				return new Token(TokenType.FLOAT_VAL, riga,
-						formatNumber(sb).toString() + "." + scanFloat(sb).toString());
-		}
-
-		if (skipChars.contains(c) || charTypeHMap.containsKey(c.toString()))
-			return new Token(TokenType.INT_VAL, riga, formatNumber(sb).toString());
+			readChar();
+			return new Token(TokenType.FLOAT_VAL, riga,
+					sb.toString() + c + scanFloat(sb).toString());
+		} else if (skipChars.contains(c) || charTypeHMap.containsKey(c.toString()))
+			return new Token(TokenType.INT_VAL, riga, sb.toString());
 
 		throw new LexicalException("Errore in scanNumber() alla riga " + riga + ", sono arrivato a '" + sb.toString()
 				+ "' ma ho trovato '" + c + "'");
@@ -284,46 +251,36 @@ public class Scanner {
 	 * @param integerPart
 	 * @return
 	 * @throws LexicalException
+	 * @throws IOException
 	 */
-	private StringBuilder scanFloat(StringBuilder integerPart) throws LexicalException {
+	private StringBuilder scanFloat(StringBuilder integerPart) throws LexicalException, IOException {
 		StringBuilder sb = new StringBuilder();
 		Character c;
-		try {
-			c = peekChar();
-		} catch (IOException e) {
-			throw new LexicalException("Non funziona peekChar() alla riga " + riga, e);
-		}
+
+		c = peekChar();
 
 		while (digits.contains(c)) {
 			sb.append(c);
-			try {
-				c = readAndPeekChar();
-			} catch (IOException e) {
-				throw new LexicalException("Non funziona readAndPeekChar() alla riga " + riga, e);
-			}
+			readChar();
+			c = peekChar();
 		}
 
 		if (letters.contains(c))
-			throw new LexicalException("Errore in scanNumber() alla riga " + riga + ", sono arrivato a '"
+			throw new LexicalException("Errore in scanFloat() alla riga " + riga + ", sono arrivato a '"
 					+ integerPart.toString() + '.' + sb.toString()
 					+ "' ma ho trovato '" + c + "'");
 
-		return formatNumber(sb);
-	}
+		if (sb.toString().length() == 0)
+			throw new LexicalException("Errore in scanFloat() alla riga " + riga
+					+ ", il valore float deve avere almeno una cifra decimale");
 
-	private StringBuilder formatNumber(StringBuilder sb) {
-		if (sb == null)
-			throw new IllegalArgumentException("L'argomento 'sb' dev'essere diverso da null");
+		if (sb.toString().length() > 4)
+			throw new LexicalException("Errore in scanFloat() alla riga " + riga
+					+ ", il valore float puó contenere fino a 4 cifre decimali numeriche");
 
-		String s = sb.toString();
-		if (s.equals(""))
-			return sb.append("0");
-
-		if (s.equals("0"))
-			return sb;
-
-		while (sb.toString().length() > 1 && sb.toString().charAt(0) == '0')
-			sb = new StringBuilder(sb.substring(1));
+		if (sb.charAt(sb.length() - 1) == '0' && sb.length() > 1)
+			throw new LexicalException("Errore in scanFloat() alla riga " + riga
+					+ ", l'ultima cifra decimale del valore float non puó essere 0");
 
 		return sb;
 	}
@@ -335,7 +292,11 @@ public class Scanner {
 	 * @throws IOException error about non-existing input file
 	 */
 	private char readChar() throws IOException {
-		return ((char) this.buffer.read());
+		try {
+			return ((char) this.buffer.read());
+		} catch (IOException e) {
+			throw new IOException("Non funziona readChar() alla riga " + riga, e.getCause());
+		}
 	}
 
 	/**
@@ -345,14 +306,13 @@ public class Scanner {
 	 * @throws IOException error about non-existing input file
 	 */
 	private char peekChar() throws IOException {
-		char c = (char) buffer.read();
-		buffer.unread(c);
-
+		char c;
+		try {
+			c = (char) buffer.read();
+			buffer.unread(c);
+		} catch (IOException e) {
+			throw new IOException("Non funziona peekChar() alla riga " + riga, e.getCause());
+		}
 		return c;
-	}
-
-	private char readAndPeekChar() throws IOException {
-		readChar();
-		return peekChar();
 	}
 }

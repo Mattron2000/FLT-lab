@@ -1,5 +1,7 @@
 package parser;
 
+import java.io.IOException;
+
 import scanner.LexicalException;
 import scanner.Scanner;
 import token.Token;
@@ -13,7 +15,7 @@ public class Parser {
         this.scanner = scanner;
     }
 
-    private Token match(TokenType type) throws LexicalException, SyntacticException {
+    private Token match(TokenType type) throws LexicalException, SyntacticException, IOException {
         Token tk = this.scanner.peekToken();
         if (type.equals(tk.getTipo()))
             return this.scanner.nextToken();
@@ -23,11 +25,11 @@ public class Parser {
                             + " alla riga " + tk.getRiga());
     }
 
-    public void parse() throws SyntacticException, LexicalException {
+    public void parse() throws SyntacticException, LexicalException, IOException {
         this.parsePrg();
     }
 
-    private void parsePrg() throws SyntacticException, LexicalException {
+    private void parsePrg() throws SyntacticException, LexicalException, IOException {
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
             case TokenType.FLOAT_KW, TokenType.INT_KW, TokenType.ID, TokenType.PRINT, TokenType.EOF: // Prg -> DSs $

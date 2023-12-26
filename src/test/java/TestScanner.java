@@ -1,6 +1,6 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +47,7 @@ class TestScanner {
 	}
 
 	@Test
-	void testEOF() throws LexicalException, FileNotFoundException {
+	void testEOF() throws LexicalException, IOException {
 		Scanner s = new Scanner(testScannerFolder + "testEOF.txt");
 		Token t = s.nextToken();
 
@@ -63,7 +63,7 @@ class TestScanner {
 	}
 
 	@Test
-	void testFloat() throws LexicalException, FileNotFoundException {
+	void testFloat() throws LexicalException, IOException {
 		Scanner s = new Scanner(testScannerFolder + "testFLOAT.txt");
 		Token t = s.nextToken();
 
@@ -84,7 +84,7 @@ class TestScanner {
 		t = s.nextToken();
 		assertEquals(5, t.getRiga());
 		assertEquals(TokenType.FLOAT_VAL, t.getTipo());
-		assertEquals("89.99999", t.getValore());
+		assertEquals("89.9999", t.getValore());
 
 		t = s.nextToken();
 		assertEquals(5, t.getRiga());
@@ -93,7 +93,7 @@ class TestScanner {
 	}
 
 	@Test
-	void testGenerale() throws LexicalException, FileNotFoundException {
+	void testGenerale() throws LexicalException, IOException {
 		Scanner s = new Scanner(testScannerFolder + "testGenerale.txt");
 		Token t = s.nextToken();
 
@@ -198,7 +198,7 @@ class TestScanner {
 	}
 
 	@Test
-	void testId() throws LexicalException, FileNotFoundException {
+	void testId() throws LexicalException, IOException {
 		Scanner s = new Scanner(testScannerFolder + "testId.txt");
 		Token t = s.nextToken();
 
@@ -227,7 +227,7 @@ class TestScanner {
 	}
 
 	@Test
-	void testIdKeywords() throws LexicalException, FileNotFoundException {
+	void testIdKeywords() throws LexicalException, IOException {
 		Scanner s = new Scanner(testScannerFolder + "testIdKeyWords.txt");
 		Token t = s.nextToken();
 
@@ -277,7 +277,7 @@ class TestScanner {
 	}
 
 	@Test
-	void testInt() throws LexicalException, FileNotFoundException {
+	void testInt() throws LexicalException, IOException {
 		Scanner s = new Scanner(testScannerFolder + "testINT.txt");
 		Token t = s.nextToken();
 
@@ -302,7 +302,7 @@ class TestScanner {
 	}
 
 	@Test
-	void testKeywords() throws LexicalException, FileNotFoundException {
+	void testKeywords() throws LexicalException, IOException {
 		Scanner s = new Scanner(testScannerFolder + "testKeywords.txt");
 		Token t = s.nextToken();
 
@@ -327,7 +327,7 @@ class TestScanner {
 	}
 
 	@Test
-	void testOperators() throws LexicalException, FileNotFoundException {
+	void testOperators() throws LexicalException, IOException {
 		Scanner s = new Scanner(testScannerFolder + "testOperators.txt");
 		Token t = s.nextToken();
 
@@ -397,7 +397,7 @@ class TestScanner {
 	}
 
 	@Test
-	void testErroriID() throws LexicalException, FileNotFoundException {
+	void testErroriID() throws LexicalException, IOException {
 		Scanner s = new Scanner(testScannerFolder + "erroriID");
 		Token t = s.nextToken();
 
@@ -407,7 +407,7 @@ class TestScanner {
 	}
 
 	@Test
-	void testErroriNumbers() throws LexicalException, FileNotFoundException {
+	void testErroriNumbers() throws LexicalException, IOException {
 		Scanner s = null;
 		Token t = null;
 
@@ -418,16 +418,13 @@ class TestScanner {
 
 			switch (i) {
 				case 1:
-					t = s.nextToken();
-					assertEquals(t.getRiga(), 1);
-					assertEquals(t.getTipo(), TokenType.INT_VAL);
-					assertEquals(t.getValore(), "0");
-
-					t = s.nextToken();
-					assertEquals(t.getRiga(), 5);
-					assertEquals(t.getTipo(), TokenType.EOF);
-					assertEquals(t.getValore(), null);
-
+					try {
+						t = s.nextToken();
+					} catch (LexicalException e) {
+						System.out.println(e.getMessage());
+						assertEquals("Errore in scanNumber() alla riga 1, non puoi creare un numero intero iniziando con la cifra zero",
+								e.getMessage());
+					}
 					break;
 				case 2:
 					try {
@@ -448,7 +445,5 @@ class TestScanner {
 					break;
 			}
 		}
-
-		System.out.println(t.toString());
 	}
 }
