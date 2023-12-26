@@ -411,7 +411,7 @@ class TestScanner {
 		Scanner s = null;
 		Token t = null;
 
-		for (int i = 1; i < +4; i++) {
+		for (int i = 1; i <= 4; i++) {
 			s = new Scanner(
 					testScannerFolder + "erroriNumbers/erroriNumbers" + i
 							+ ".txt");
@@ -436,12 +436,22 @@ class TestScanner {
 					}
 					break;
 				case 3:
-					System.out.println("3");
-
+					try {
+						t = s.nextToken();
+					} catch (LexicalException e) {
+						System.out.println(e.getMessage());
+						assertEquals("Errore in scanFloat() alla riga 3, sono arrivato a '12.' ma ho trovato 'a'",
+								e.getMessage());
+					}
 					break;
 				case 4:
-					System.out.println("4");
-
+					try {
+						t = s.nextToken();
+					} catch (LexicalException e) {
+						System.out.println(e.getMessage());
+						assertEquals("Errore in scanFloat() alla riga 4, il valore float puó contenere fino a 4 cifre decimali numeriche",
+								e.getMessage());
+					}
 					break;
 			}
 		}
