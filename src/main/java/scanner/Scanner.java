@@ -11,14 +11,16 @@ import java.util.HashMap;
 import token.Token;
 import token.TokenType;
 
+/**
+ * componente per la scansione di file di testo di input per generare token
+ */
 public class Scanner {
-	final char EOF = (char) -1;
 	private int riga = 1;
 	private PushbackReader buffer;
 	private Token nextTk = null;
 
 	/**
-	 * insieme caratteri di skip (incluso EOF) e inizializzazione
+	 * set di caratteri da saltare nella fase di scansione
 	 */
 	private static final ArrayList<Character> skipChars;
 	static {
@@ -30,7 +32,7 @@ public class Scanner {
 	}
 
 	/**
-	 * lettere alfanumeriche minuscole e maiuscole
+	 * set di caratteri alfabetici minuscoli e maiuscoli
 	 */
 	private static final ArrayList<Character> letters;
 	static {
@@ -39,83 +41,81 @@ public class Scanner {
 			letters.add((char) i);
 		for (int i = (int) 'A'; i <= (int) 'Z'; i++)
 			letters.add((char) i);
-
-		//// DEBUG
-		// for (Character c : letters)
-		// System.out.println(c);
 	}
 
 	/**
-	 * cifre numeriche
+	 * set di cifre numeriche
 	 */
 	private static final ArrayList<Character> digits;
 	static {
 		digits = new ArrayList<>();
 		for (int i = (int) '0'; i <= (int) '9'; i++)
 			digits.add((char) i);
-
-		//// DEBUG
-		// for (Character c : digits)
-		// System.out.println(c);
 	}
 
 	/**
-	 * associo i simboli di operazione +,-,*,\,...,; con il TokenType corrispondente
+	 * map di simboli di operazione, di assegnamento e ';' con il TokenType
+	 * corrispondente
 	 */
-	private static final HashMap<String, TokenType> charTypeHMap;
+	private static final HashMap<String, TokenType> opAssHM;
 	static {
-		charTypeHMap = new HashMap<>();
-		charTypeHMap.put("+", TokenType.PLUS);
-		charTypeHMap.put("-", TokenType.MINUS);
-		charTypeHMap.put("*", TokenType.MULT);
-		charTypeHMap.put("/", TokenType.DIVIDE);
-		charTypeHMap.put(";", TokenType.SEMICOLON);
-		charTypeHMap.put("=", TokenType.ASSIGN);
-		charTypeHMap.put("+=", TokenType.PLUS_ASSIGN);
-		charTypeHMap.put("-=", TokenType.MINUS_ASSIGN);
-		charTypeHMap.put("*=", TokenType.MULT_ASSIGN);
-		charTypeHMap.put("/=", TokenType.DIVIDE_ASSIGN);
-		charTypeHMap.put("++", TokenType.INCREMENT);
-		charTypeHMap.put("--", TokenType.DECREMENT);
-
-		// DEBUG
-		// for (Character c : charTypeHMap.keySet())
-		// System.out.println("char: " + c + "\tToken type: " + charTypeHMap.get(c));
+		opAssHM = new HashMap<>();
+		opAssHM.put("+", TokenType.PLUS);
+		opAssHM.put("-", TokenType.MINUS);
+		opAssHM.put("*", TokenType.MULT);
+		opAssHM.put("/", TokenType.DIVIDE);
+		opAssHM.put(";", TokenType.SEMICOLON);
+		opAssHM.put("=", TokenType.ASSIGN);
+		opAssHM.put("+=", TokenType.PLUS_ASSIGN);
+		opAssHM.put("-=", TokenType.MINUS_ASSIGN);
+		opAssHM.put("*=", TokenType.MULT_ASSIGN);
+		opAssHM.put("/=", TokenType.DIVIDE_ASSIGN);
+		opAssHM.put("++", TokenType.INCREMENT);
+		opAssHM.put("--", TokenType.DECREMENT);
 	}
 
 	/**
-	 * associo le keyword con il TokenType corrispondente
+	 * map of keyword with the corresponding TokenType
 	 */
-	private static final HashMap<String, TokenType> keywordHMap;
+	private static final HashMap<String, TokenType> keywordsHM;
 	static {
-		keywordHMap = new HashMap<>();
-		keywordHMap.put("print", TokenType.PRINT);
-		keywordHMap.put("float", TokenType.FLOAT_KW);
-		keywordHMap.put("int", TokenType.INT_KW);
-
-		// DEBUG
-		// for (String kw : keywordHMap.keySet())
-		// System.out.println("keyword: " + kw + "\tToken type: " +
-		// keywordHMap.get(kw));
+		keywordsHM = new HashMap<>();
+		keywordsHM.put("print", TokenType.PRINT);
+		keywordsHM.put("float", TokenType.FLOAT_KW);
+		keywordsHM.put("int", TokenType.INT_KW);
 	}
 
 	/**
-	 * Costruttore dello Scanner
+	 * Scanner constructor that sets the path where the input file is located
 	 * 
-	 * @param fileName percorso assoluto del file di testo da scannerizzare
-	 * @throws FileNotFoundException errore se il percorso indicato non c'é il
-	 *                               file.txt
+	 * @param fileName absolute path of the text file to be scanned
+	 * @throws FileNotFoundException error if the path indicated does not contain
+	 *                               the file
 	 */
 	public Scanner(String fileName) throws FileNotFoundException {
 		this.buffer = new PushbackReader(new FileReader(fileName));
 	}
 
+	/**
+	 * read token without consuming
+	 * 
+	 * @return
+	 * @throws LexicalException
+	 * @throws IOException
+	 */
 	public Token peekToken() throws LexicalException, IOException {
 		if (this.nextTk == null)
 			this.nextTk = nextToken();
 		return nextTk;
 	}
 
+	/**
+	 * reads the token while consuming it
+	 * 
+	 * @return Token corrente
+	 * @throws LexicalException
+	 * @throws IOException
+	 */
 	public Token nextToken() throws LexicalException, IOException {
 		if (this.nextTk != null) {
 			Token tk = this.nextTk;
@@ -143,8 +143,8 @@ public class Scanner {
 		if (letters.contains(c))
 			return scanId();
 
-		// Se `c` é presente in charTypeHMap, allora é un operatore o un delimitatore
-		if (charTypeHMap.containsKey(c.toString()))
+		// Se `c` é presente in opAssHM, allora é un operatore o un delimitatore
+		if (opAssHM.containsKey(c.toString()))
 			return scanOp();
 
 		// Se `c` é una cifra numerica, allora é INT_VAL o FLOAT_VAL
@@ -159,9 +159,10 @@ public class Scanner {
 	}
 
 	/**
+	 * legge uno o due caratteri per riconoscere l'operatore
 	 * 
-	 * @return un Token di tipo OPERATOR (SUM, MINUS, ...) o SEMICOLON
-	 * @throws LexicalException ci sono caratteri non appartenenti a charTypeHMap
+	 * @return Token di tipo operatore (SUM, MINUS, ...) o SEMICOLON
+	 * @throws LexicalException
 	 * @throws IOException
 	 */
 	private Token scanOp() throws LexicalException, IOException {
@@ -172,21 +173,21 @@ public class Scanner {
 		sc = peekChar();
 
 		String s = fc.toString() + sc.toString();
-		if (charTypeHMap.containsKey(s)) {
+		if (opAssHM.containsKey(s)) {
 			sc = readChar();
 		} else
 			s = fc.toString();
 
-		return new Token(charTypeHMap.get(s), riga);
+		return new Token(opAssHM.get(s), riga);
 	}
 
 	/**
-	 * che legge tutte le lettere minuscole e maiuscole e cifre numeriche
+	 * legge tutte le lettere minuscole e maiuscole e cifre numeriche
 	 * 
 	 * @return un Token ID o il Token associato KEYWORD
 	 * @throws LexicalException ci sono caratteri che non ci devono essere in un
 	 *                          ID/KEYWORD
-	 * @throws IOException
+	 * @throws IOException      errore riguardo a input file non esistente
 	 */
 	private Token scanId() throws LexicalException, IOException {
 		StringBuilder sb = new StringBuilder();
@@ -200,7 +201,7 @@ public class Scanner {
 			c = peekChar();
 		} while (letters.contains(c) || digits.contains(c));
 
-		TokenType tt = keywordHMap.get(sb.toString());
+		TokenType tt = keywordsHM.get(sb.toString());
 
 		if (tt != null)
 			return new Token(tt, riga);
@@ -214,7 +215,7 @@ public class Scanner {
 	 * @return un Token INT_VAL o FLOAT_VAL
 	 * @throws LexicalException ci sono caratteri al di fuori di quelle numeriche
 	 *                          e/o il '.'
-	 * @throws IOException
+	 * @throws IOException      errore riguardo a input file non esistente
 	 */
 	private Token scanNumber() throws LexicalException, IOException {
 		StringBuilder sb = new StringBuilder();
@@ -239,7 +240,7 @@ public class Scanner {
 			readChar();
 			return new Token(TokenType.FLOAT_VAL, riga,
 					sb.toString() + c + scanFloat(sb).toString());
-		} else if (skipChars.contains(c) || charTypeHMap.containsKey(c.toString()))
+		} else if (skipChars.contains(c) || opAssHM.containsKey(c.toString()))
 			return new Token(TokenType.INT_VAL, riga, sb.toString());
 
 		throw new LexicalException("Errore in scanNumber() alla riga " + riga + ", sono arrivato a '" + sb.toString()
@@ -247,9 +248,10 @@ public class Scanner {
 	}
 
 	/**
+	 * legge i caratteri come decimali di un numero (dopo il '.')
 	 * 
-	 * @param integerPart
-	 * @return
+	 * @param integerPart parte intera del numero
+	 * @return parte decimale del numero
 	 * @throws LexicalException
 	 * @throws IOException
 	 */
@@ -286,10 +288,10 @@ public class Scanner {
 	}
 
 	/**
-	 * Read buffer consuming a character
+	 * legge il buffer consumando un carattere
 	 * 
-	 * @return character at first of queue
-	 * @throws IOException error about non-existing input file
+	 * @return il primo carattere in coda
+	 * @throws IOException errore riguardo a input file non esistenti
 	 */
 	private char readChar() throws IOException {
 		try {
@@ -300,10 +302,10 @@ public class Scanner {
 	}
 
 	/**
-	 * Read buffer without consume
+	 * legge il buffer senza consumare il carattere
 	 * 
-	 * @return character at first of queue
-	 * @throws IOException error about non-existing input file
+	 * @return il primo carattere in coda
+	 * @throws IOException errore riguardo a input file non esistenti
 	 */
 	private char peekChar() throws IOException {
 		char c;

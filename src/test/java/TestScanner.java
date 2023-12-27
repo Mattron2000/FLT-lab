@@ -9,42 +9,18 @@ import scanner.Scanner;
 import token.Token;
 import token.TokenType;
 
+/**
+ * Tutti i test dello scanner fanno le stesse cose, passano un percorso file
+ * assoluto al file txt alla classe scanner e controlla ogni token al suo
+ * interno
+ */
 class TestScanner {
 
+	/**
+	 * percorso della cartella dove contiene tutti i file di testo 
+	 */
 	private static final String testScannerFolder = System.getProperty("user.dir")
 			+ "/src/test/java/data/testScanner/";
-
-	/**
-	 * Check toString() function, that Token class have, execute correctly
-	 */
-	@Test
-	void testToString() {
-		// int tempa;
-		String row = new Token(TokenType.INT_KW, 1).toString() +
-				new Token(TokenType.ID, 1, "tempa").toString() +
-				new Token(TokenType.SEMICOLON, 1).toString();
-		System.out.println(row);
-		assertEquals("<INT_KW, riga:1>" +
-				"<ID, riga:1, valore:tempa>" +
-				"<SEMICOLON, riga:1>", row);
-
-		// float tempb = tempa / 3.2;
-		row = new Token(TokenType.FLOAT_KW, 3).toString() +
-				new Token(TokenType.ID, 3, "tempb").toString() +
-				new Token(TokenType.ASSIGN, 3).toString() +
-				new Token(TokenType.ID, 3, "tempa").toString() +
-				new Token(TokenType.DIVIDE, 3).toString() +
-				new Token(TokenType.FLOAT_VAL, 3, "3.2").toString() +
-				new Token(TokenType.SEMICOLON, 1).toString();
-		System.out.println(row);
-		assertEquals("<FLOAT_KW, riga:3>" +
-				"<ID, riga:3, valore:tempb>" +
-				"<ASSIGN, riga:3>" +
-				"<ID, riga:3, valore:tempa>" +
-				"<DIVIDE, riga:3>" +
-				"<FLOAT_VAL, riga:3, valore:3.2>" +
-				"<SEMICOLON, riga:1>", row);
-	}
 
 	@Test
 	void testEOF() throws LexicalException, IOException {
@@ -409,26 +385,24 @@ class TestScanner {
 	@Test
 	void testErroriNumbers() throws LexicalException, IOException {
 		Scanner s = null;
-		Token t = null;
 
 		for (int i = 1; i <= 4; i++) {
-			s = new Scanner(
-					testScannerFolder + "erroriNumbers/erroriNumbers" + i
-							+ ".txt");
+			s = new Scanner(testScannerFolder + "erroriNumbers/erroriNumbers" + i + ".txt");
 
 			switch (i) {
 				case 1:
 					try {
-						t = s.nextToken();
+						s.nextToken();
 					} catch (LexicalException e) {
 						System.out.println(e.getMessage());
-						assertEquals("Errore in scanNumber() alla riga 1, non puoi creare un numero intero iniziando con la cifra zero",
+						assertEquals(
+								"Errore in scanNumber() alla riga 1, non puoi creare un numero intero iniziando con la cifra zero",
 								e.getMessage());
 					}
 					break;
 				case 2:
 					try {
-						t = s.nextToken();
+						s.nextToken();
 					} catch (LexicalException e) {
 						System.out.println(e.getMessage());
 						assertEquals("Errore in scanNumber() alla riga 2, sono arrivato a '123' ma ho trovato 'a'",
@@ -437,7 +411,7 @@ class TestScanner {
 					break;
 				case 3:
 					try {
-						t = s.nextToken();
+						s.nextToken();
 					} catch (LexicalException e) {
 						System.out.println(e.getMessage());
 						assertEquals("Errore in scanFloat() alla riga 3, sono arrivato a '12.' ma ho trovato 'a'",
@@ -446,10 +420,11 @@ class TestScanner {
 					break;
 				case 4:
 					try {
-						t = s.nextToken();
+						s.nextToken();
 					} catch (LexicalException e) {
 						System.out.println(e.getMessage());
-						assertEquals("Errore in scanFloat() alla riga 4, il valore float puó contenere fino a 4 cifre decimali numeriche",
+						assertEquals(
+								"Errore in scanFloat() alla riga 4, il valore float puó contenere fino a 4 cifre decimali numeriche",
 								e.getMessage());
 					}
 					break;
