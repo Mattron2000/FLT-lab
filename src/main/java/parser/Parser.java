@@ -15,14 +15,23 @@ public class Parser {
         this.scanner = scanner;
     }
 
+    /**
+     * Check that the current token is the same TokenType of 'type'
+     * 
+     * @param type Expected TokenType
+     * @return current token
+     * @throws LexicalException
+     * @throws SyntacticException
+     * @throws IOException
+     */
     private Token match(TokenType type) throws LexicalException, SyntacticException, IOException {
         Token tk = this.scanner.peekToken();
-        if (type.equals(tk.getTipo()))
+
+        if (tk.getTipo().equals(type))
             return this.scanner.nextToken();
         else
-            throw new SyntacticException(
-                    "Aspettavo il tipo " + type.toString() + " e invece ho trovato " + tk.getTipo().toString()
-                            + " alla riga " + tk.getRiga());
+            throw new SyntacticException("Aspettavo il tipo " + type.toString() + " e invece ho trovato "
+                    + tk.getTipo().toString() + " alla riga " + tk.getRiga());
     }
 
     public void parse() throws SyntacticException, LexicalException, IOException {
@@ -43,19 +52,18 @@ public class Parser {
     }
 
     private void parseDSs() throws SyntacticException, LexicalException, IOException {
-        // TODO
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
-            case TokenType.FLOAT_KW: // DSs -> Dcl DSs
-                // TODO
-                match(null);
+            case FLOAT_KW, INT_KW: // DSs -> Dcl DSs
+                // TODO Dcl
+                // TODO DSs
                 break;
-            case TokenType.INT_KW: // DSs -> Stm DSs
-                // TODO
-                match(null);
+            case ID, PRINT: // DSs -> Stm DSs
+                // TODO Stm
+                // TODO DSs
                 break;
-            case TokenType.INT_VAL: // DSs -> ϵ
-                // TODO
+            case EOF: // DSs -> ϵ
+                // TODO ϵ
                 break;
             default:
                 throw new SyntacticException(
@@ -64,12 +72,12 @@ public class Parser {
     }
 
     private void parseDcl() throws SyntacticException, LexicalException, IOException {
-        // TODO
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
-            case TokenType.FLOAT_KW: // Dcl -> Ty id DclP
-                // TODO
-                match(null);
+            case FLOAT_KW, INT_KW: // Dcl -> Ty id DclP
+                // TODO Ty
+                // TODO id
+                // TODO DclP
                 break;
             default:
                 throw new SyntacticException(
@@ -78,16 +86,14 @@ public class Parser {
     }
 
     private void parseDclP() throws SyntacticException, LexicalException, IOException {
-        // TODO
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
-            case TokenType.FLOAT_KW: // DclP -> ;
-                // TODO
-                match(null);
+            case SEMICOLON: // DclP -> ;
+                // TODO ;
                 break;
-            case TokenType.INT_KW: // DclP -> opAss Exp;
-                // TODO
-                match(null);
+            case ASSIGN: // DclP -> opAss Exp;
+                // TODO opAss
+                // TODO Exp
                 break;
             default:
                 throw new SyntacticException(
@@ -96,16 +102,16 @@ public class Parser {
     }
 
     private void parseStm() throws SyntacticException, LexicalException, IOException {
-        // TODO
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
-            case TokenType.FLOAT_KW: // Stm -> id opAss Exp
-                // TODO
-                match(null);
+            case ID: // Stm -> id opAss Exp
+                // TODO id
+                // TODO opAss
+                // TODO Exp
                 break;
-            case TokenType.INT_KW: // Stm -> print id;
-                // TODO
-                match(null);
+            case PRINT: // Stm -> print id;
+                // TODO print
+                // TODO id
                 break;
             default:
                 throw new SyntacticException(
@@ -114,12 +120,11 @@ public class Parser {
     }
 
     private void parseExp() throws SyntacticException, LexicalException, IOException {
-        // TODO
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
-            case TokenType.FLOAT_KW: // Exp -> Tr ExpP
-                // TODO
-                match(null);
+            case ID, FLOAT_VAL, INT_VAL: // Exp -> Tr ExpP
+                // TODO Tr
+                // TODO ExpP
                 break;
             default:
                 throw new SyntacticException(
@@ -128,20 +133,20 @@ public class Parser {
     }
 
     private void parseExpP() throws SyntacticException, LexicalException, IOException {
-        // TODO
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
-            case TokenType.FLOAT_KW: // ExpP -> + Tr ExpP
-                // TODO
-                match(null);
+            case PLUS: // ExpP -> + Tr ExpP
+                // TODO +
+                // TODO Tr
+                // TODO ExpP
                 break;
-            case TokenType.INT_KW: // ExpP -> - Tr ExpP
-                // TODO
-                match(null);
+            case MINUS: // ExpP -> - Tr ExpP
+                // TODO -
+                // TODO Tr
+                // TODO ExpP
                 break;
-            case TokenType.PRINT: // ExpP -> ϵ
-                // TODO
-                match(null);
+            case EOF: // ExpP -> ϵ
+                // TODO ϵ
                 break;
             default:
                 throw new SyntacticException(
@@ -150,12 +155,11 @@ public class Parser {
     }
 
     private void parseTr() throws SyntacticException, LexicalException, IOException {
-        // TODO
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
-            case TokenType.FLOAT_KW: // Tr -> Val TrP
-                // TODO
-                match(null);
+            case ID, FLOAT_VAL, INT_VAL: // Tr -> Val TrP
+                // TODO Val
+                // TODO TrP
                 break;
             default:
                 throw new SyntacticException(
@@ -164,20 +168,20 @@ public class Parser {
     }
 
     private void parseTrP() throws SyntacticException, LexicalException, IOException {
-        // TODO
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
-            case TokenType.FLOAT_KW: // TrP -> * Val TrP
-                // TODO
-                match(null);
+            case MULT: // TrP -> * Val TrP
+                // TODO *
+                // TODO Val
+                // TODO TrP
                 break;
-            case TokenType.INT_KW: // TrP -> / Val TrP
-                // TODO
-                match(null);
+            case DIVIDE: // TrP -> / Val TrP
+                // TODO /
+                // TODO Val
+                // TODO TrP
                 break;
-            case TokenType.PRINT: // TrP -> ϵ
-                // TODO
-                match(null);
+            case EOF: // TrP -> ϵ
+                // TODO ϵ
                 break;
             default:
                 throw new SyntacticException(
@@ -186,16 +190,13 @@ public class Parser {
     }
 
     private void parseTy() throws SyntacticException, LexicalException, IOException {
-        // TODO
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
             case TokenType.FLOAT_KW: // Ty -> float
-                // TODO
-                match(null);
+                // TODO float
                 break;
             case TokenType.INT_KW: // Ty -> int
-                // TODO
-                match(null);
+                // TODO int
                 break;
             default:
                 throw new SyntacticException(
@@ -204,25 +205,20 @@ public class Parser {
     }
 
     private void parseVal() throws SyntacticException, LexicalException, IOException {
-        // TODO
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
-            case TokenType.FLOAT_KW: // Val -> intVal
-                // TODO
-                match(null);
+            case INT_VAL: // Val -> intVal
+                // TODO intVal
                 break;
-            case TokenType.INT_KW: // Val -> floatVal
-                // TODO
-                match(null);
+            case FLOAT_VAL: // Val -> floatVal
+                // TODO floatVal
                 break;
-            case TokenType.PRINT: // Val -> id
-                // TODO
-                match(null);
+            case ID: // Val -> id
+                // TODO id
                 break;
             default:
                 throw new SyntacticException(
                         "Token " + tk.toString() + " alla riga " + tk.getRiga());
         }
     }
-
 }
