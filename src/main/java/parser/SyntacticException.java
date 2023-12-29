@@ -1,5 +1,6 @@
 package parser;
 
+import scanner.LexicalException;
 import token.Token;
 
 public class SyntacticException extends Exception {
@@ -13,4 +14,9 @@ public class SyntacticException extends Exception {
     public SyntacticException(String message) {
         super(message);
     }
+
+    public SyntacticException(String message, LexicalException e) {
+        super(message, e);
+    }
+    
 }
