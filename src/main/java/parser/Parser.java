@@ -3,7 +3,6 @@ package parser;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import ast.LangOper;
 import ast.LangType;
 import ast.NodeAssign;
 import ast.NodeConst;
