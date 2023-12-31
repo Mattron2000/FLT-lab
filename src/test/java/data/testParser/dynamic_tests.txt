@@ -8,4 +8,5 @@ testParserEcc_4.txt,        testEcc4
 testParserEcc_5.txt,        testEcc5
 testParserEcc_6.txt,        testEcc6
 testParserEcc_7.txt,        testEcc7
-testSoloDichPrint1.txt,     testSoloDich
+testSoloDichPrint1.txt,     testSoloDich1
+testSoloDichPrint2.txt,     testSoloDich2

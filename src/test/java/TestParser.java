@@ -4,12 +4,14 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
+import ast.NodePrg;
 import parser.Parser;
 import scanner.Scanner;
 
@@ -18,7 +20,8 @@ class TestParser {
 
 	@TestFactory
 	public Stream<DynamicTest> generateDynamicTests() {
-		String fileDynamicTestFilePath = RootFolderOfJavaProject + "dynamic_tests.txt";
+		String fileDynamicTestFilePath = RootFolderOfJavaProject +
+				"dynamic_tests.txt";
 		ArrayList<DynamicTest> dynamicTests = new ArrayList<>();
 
 		try (BufferedReader br = new BufferedReader(new FileReader(fileDynamicTestFilePath))) {
@@ -34,7 +37,9 @@ class TestParser {
 					Scanner s = new Scanner(RootFolderOfJavaProject + fileName);
 					Parser p = new Parser(s);
 
-					p.parse();
+					NodePrg nodePrg = p.parse();
+
+					System.out.println(nodePrg.toString());
 				}));
 			}
 		} catch (IOException e) {
@@ -43,4 +48,44 @@ class TestParser {
 
 		return dynamicTests.stream();
 	}
+
+	// @Test
+	// public void testSoloDclPrint1() throws SyntacticException, LexicalException, IOException {
+	// 	Scanner s = new Scanner(RootFolderOfJavaProject + "testSoloDichPrint1.txt");
+	// 	Parser p = new Parser(s);
+
+	// 	NodePrg nodePrg = p.parse();
+
+	// 	System.out.println(nodePrg.toString());
+	// }
+
+	// @Test
+	// public void testSoloDclPrint2() throws SyntacticException, LexicalException, IOException {
+	// 	Scanner s = new Scanner(RootFolderOfJavaProject + "testSoloDichPrint2.txt");
+	// 	Parser p = new Parser(s);
+
+	// 	NodePrg nodePrg = p.parse();
+
+	// 	System.out.println(nodePrg.toString());
+	// }
+
+	// @Test
+	// public void testCorretto1() throws SyntacticException, LexicalException, IOException {
+	// 	Scanner s = new Scanner(RootFolderOfJavaProject + "testParserCorretto1.txt");
+	// 	Parser p = new Parser(s);
+
+	// 	NodePrg nodePrg = p.parse();
+
+	// 	System.out.println(nodePrg.toString());
+	// }
+
+	// @Test
+	// public void testCorretto2() throws SyntacticException, LexicalException, IOException {
+	// 	Scanner s = new Scanner(RootFolderOfJavaProject + "testParserCorretto2.txt");
+	// 	Parser p = new Parser(s);
+
+	// 	NodePrg nodePrg = p.parse();
+
+	// 	System.out.println(nodePrg.toString());
+	// }
 }
