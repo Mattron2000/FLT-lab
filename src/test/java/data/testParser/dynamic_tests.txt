@@ -10,5 +10,13 @@ testParserEcc_4.txt,,            testEcc4,,           Aspettavo un token di tipo
 testParserEcc_5.txt,,            testEcc5,,           Aspettavo un token di tipo ID e invece ho trovato un token di tipo INT_VAL alla riga 3
 testParserEcc_6.txt,,            testEcc6,,           Aspettavo un token di tipo ID e invece ho trovato un token di tipo FLOAT_KW alla riga 4
 testParserEcc_7.txt,,            testEcc7,,           Aspettavo un token di tipo ID e invece ho trovato un token di tipo ASSIGN alla riga 2
+testParserEccCorretto_0.txt,,    testEccCorretto0,,   null
+testParserEccCorretto_1.txt,,    testEccCorretto1,,   null
+testParserEccCorretto_2.txt,,    testEccCorretto2,,   null
+testParserEccCorretto_3.txt,,    testEccCorretto3,,   null
+testParserEccCorretto_4.txt,,    testEccCorretto4,,   null
+testParserEccCorretto_5.txt,,    testEccCorretto5,,   null
+testParserEccCorretto_6.txt,,    testEccCorretto6,,   null
+testParserEccCorretto_7.txt,,    testEccCorretto7,,   null
 testSoloDichPrint1.txt,,         testSoloDich1,,      null
 testSoloDichPrint2.txt,,         testSoloDich2,,      null
