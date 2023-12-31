@@ -3,9 +3,13 @@ package parser;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import ast.LangOper;
 import ast.LangType;
+import ast.NodeAssign;
+import ast.NodeConst;
 import ast.NodeDSs;
 import ast.NodeDcl;
+import ast.NodeDefer;
 import ast.NodeExpr;
 import ast.NodeId;
 import ast.NodePrg;
@@ -96,7 +100,7 @@ public class Parser {
                 // Ty
                 LangType type = parseTy();
                 // id
-                NodeId id = new NodeId(match(TokenType.ID));
+                NodeId id = new NodeId(match(TokenType.ID).getValore());
                 // DclP
                 NodeExpr expr = parseDclP();
 
@@ -117,14 +121,18 @@ public class Parser {
 
                 return null;
             case ASSIGN: // DclP -> opAss Exp ;
-                // TODO opAss
-                // TODO Exp
+                // opAss
+                match(TokenType.ASSIGN);
+                // Exp
+                NodeExpr expr = parseExpr();
+                // ;
+                match(TokenType.SEMICOLON);
 
-                return null;
+                return expr;
             default:
                 throw new SyntacticException(
                         "Token " + tk.toString() + " alla riga " + tk.getRiga()
-                                + " non é il tokn correto per assegnare un valore alla variabile");
+                                + " non é il tokn corretto per assegnare un valore alla variabile");
         }
     }
 
@@ -132,107 +140,155 @@ public class Parser {
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
             case ID: // Stm -> id opAss Exp ;
-                // TODO id
-                // TODO opAss
-                // TODO Exp
+                // id
+                NodeId id = new NodeId(match(TokenType.ID).getValore());
+                // opAss
+                LangOperAss langOperAss = parseStmOpAss();
+                // Exp
+                NodeExpr expr = parseExpr();
+                // ;
+                match(TokenType.SEMICOLON);
 
-                return null;
+                return new NodeAssign(langOperAss, id, expr);
             case PRINT: // Stm -> print id ;
                 // print
                 match(TokenType.PRINT);
                 // id
-                NodeId idPrint = new NodeId(match(TokenType.ID));
+                NodeId idPrint = new NodeId(match(TokenType.ID).getValore());
                 // ;
                 match(TokenType.SEMICOLON);
 
                 return new NodePrint(idPrint);
             default:
                 throw new SyntacticException(
-                        "Token " + tk.toString() + " alla riga " + tk.getRiga() + " non é quello giusto per scrivere uno statement");
+                        "Token " + tk.toString() + " alla riga " + tk.getRiga()
+                                + " non é quello giusto per scrivere uno statement");
         }
     }
 
-    // private NodeExpr parseExpr() throws SyntacticException, LexicalException,
-    // IOException {
-    // Token tk = this.scanner.peekToken();
-    // switch (tk.getTipo()) {
-    // case ID, FLOAT_VAL, INT_VAL: // Exp -> Tr ExpP
-    // // TODO Tr
-    // // TODO ExpP
+    private LangOperAss parseStmOpAss() throws SyntacticException, LexicalException, IOException {
+        Token tk = this.scanner.peekToken();
+        switch (tk.getTipo()) {
+            case PLUS_ASSIGN: // opAss -> +=
+                match(TokenType.PLUS_ASSIGN);
 
-    // return null;
-    // default:
-    // throw new SyntacticException(
-    // "Token " + tk.toString() + " alla riga " + tk.getRiga());
-    // }
-    // }
+                return LangOperAss.PLUS_ASSIGN;
+            case MINUS_ASSIGN: // opAss -> -=
+                match(TokenType.MINUS_ASSIGN);
 
-    // private NodeExpr parseExprP() throws SyntacticException, LexicalException,
-    // IOException {
-    // Token tk = this.scanner.peekToken();
-    // switch (tk.getTipo()) {
-    // case PLUS: // ExpP -> + Tr ExpP
-    // // TODO +
-    // // TODO Tr
-    // // TODO ExpP
+                return LangOperAss.MINUS_ASSIGN;
+            case MULT_ASSIGN: // opAss -> *=
+                match(TokenType.MULT_ASSIGN);
 
-    // return null;
-    // case MINUS: // ExpP -> - Tr ExpP
-    // // TODO -
-    // // TODO Tr
-    // // TODO ExpP
+                return LangOperAss.MULT_ASSIGN;
+            case DIVIDE_ASSIGN: // opAss -> /=
+                match(TokenType.DIVIDE_ASSIGN);
 
-    // return null;
-    // case SEMICOLON: // ExpP -> ϵ
-    // // TODO ϵ
+                return LangOperAss.DIVIDE_ASSIGN;
+            case ASSIGN: // opAss -> =
+                match(TokenType.ASSIGN);
 
-    // return null;
-    // default:
-    // throw new SyntacticException(
-    // "Token " + tk.toString() + " alla riga " + tk.getRiga());
-    // }
-    // }
+                return LangOperAss.ASSIGN;
+            default:
+                throw new SyntacticException(
+                        "Token " + tk.toString() + " alla riga " + tk.getRiga()
+                                + " non é quello giusto per scrivere uno statement");
+        }
+    }
 
-    // private NodeExpr parseTr() throws SyntacticException, LexicalException,
-    // IOException {
-    // Token tk = this.scanner.peekToken();
-    // switch (tk.getTipo()) {
-    // case ID, FLOAT_VAL, INT_VAL: // Tr -> Val TrP
-    // // TODO Val
-    // // TODO TrP
+    private NodeExpr parseExpr() throws SyntacticException, LexicalException, IOException {
+        Token tk = this.scanner.peekToken();
+        switch (tk.getTipo()) {
+            case ID, FLOAT_VAL, INT_VAL: // Exp -> Tr ExpP
+                // Tr
+                NodeExpr left = parseTr();
+                // ExpP
+                NodeExpr expr = parseExprP(left);
 
-    // return null;
-    // default:
-    // throw new SyntacticException(
-    // "Token " + tk.toString() + " alla riga " + tk.getRiga());
-    // }
-    // }
+                return expr;
+            default:
+                throw new SyntacticException(
+                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
+        }
+    }
 
-    // private NodeExpr parseTrP() throws SyntacticException, LexicalException,
-    // IOException {
-    // Token tk = this.scanner.peekToken();
-    // switch (tk.getTipo()) {
-    // case MULT: // TrP -> * Val TrP
-    // // TODO *
-    // // TODO Val
-    // // TODO TrP
+    private NodeExpr parseExprP(NodeExpr left) throws SyntacticException, LexicalException, IOException {
+        Token tk = this.scanner.peekToken();
+        switch (tk.getTipo()) {
+            case PLUS: // ExpP -> + Tr ExpP
+                // +
+                match(TokenType.PLUS);
+                // Tr
+                NodeExpr leftPlus = parseTr();
+                // ExpP
+                NodeExpr exprPlus = parseExprP(leftPlus);
 
-    // return null;
-    // case DIVIDE: // TrP -> / Val TrP
-    // // TODO /
-    // // TODO Val
-    // // TODO TrP
+                return exprPlus;
+            case MINUS: // ExpP -> - Tr ExpP
+                // -
+                match(TokenType.MINUS);
+                // Tr
+                NodeExpr leftMinus = parseTr();
+                // ExpP
+                NodeExpr exprMinus = parseExprP(leftMinus);
 
-    // return null;
-    // case MINUS, PLUS, SEMICOLON: // TrP -> ϵ
-    // // TODO ϵ
+                return exprMinus;
+            case SEMICOLON: // ExpP -> ϵ
+                // ϵ
 
-    // return null;
-    // default:
-    // throw new SyntacticException(
-    // "Token " + tk.toString() + " alla riga " + tk.getRiga());
-    // }
-    // }
+                return left;
+            default:
+                throw new SyntacticException(
+                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
+        }
+    }
+
+    private NodeExpr parseTr() throws SyntacticException, LexicalException, IOException {
+        Token tk = this.scanner.peekToken();
+        switch (tk.getTipo()) {
+            case ID, FLOAT_VAL, INT_VAL: // Tr -> Val TrP
+                // Val
+                NodeExpr val = parseVal();
+                // TrP
+                NodeExpr expr = parseTrP(val);
+
+                return expr;
+            default:
+                throw new SyntacticException(
+                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
+        }
+    }
+
+    private NodeExpr parseTrP(NodeExpr left) throws SyntacticException, LexicalException, IOException {
+        Token tk = this.scanner.peekToken();
+        switch (tk.getTipo()) {
+            case MULT: // TrP -> * Val TrP
+                // *
+                match(TokenType.MULT);
+                // Val
+                NodeExpr valMult = parseVal();
+                // TrP
+                NodeExpr exprMult = parseTrP(valMult);
+
+                return exprMult;
+            case DIVIDE: // TrP -> / Val TrP
+                // /
+                match(TokenType.DIVIDE);
+                // Val
+                NodeExpr valDivide = parseVal();
+                // TrP
+                NodeExpr exprDivide = parseTrP(valDivide);
+
+                return exprDivide;
+            case MINUS, PLUS, SEMICOLON: // TrP -> ϵ
+                // ϵ
+
+                return left;
+            default:
+                throw new SyntacticException(
+                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
+        }
+    }
 
     private LangType parseTy() throws SyntacticException, LexicalException, IOException {
         Token tk = this.scanner.peekToken();
@@ -253,25 +309,22 @@ public class Parser {
         }
     }
 
-    // private void parseVal() throws SyntacticException, LexicalException,
-    // IOException {
-    // Token tk = this.scanner.peekToken();
-    // switch (tk.getTipo()) {
-    // case INT_VAL: // Val -> intVal
-    // // TODO intVal
-
-    // // return null;
-    // case FLOAT_VAL: // Val -> floatVal
-    // // TODO floatVal
-
-    // // return null;
-    // case ID: // Val -> id
-    // // TODO id
-
-    // // return null;
-    // default:
-    // throw new SyntacticException(
-    // "Token " + tk.toString() + " alla riga " + tk.getRiga());
-    // }
-    // }
+    private NodeExpr parseVal() throws SyntacticException, LexicalException,
+            IOException {
+        Token tk = this.scanner.peekToken();
+        switch (tk.getTipo()) {
+            case INT_VAL: // Val -> intVal
+                // intVal
+                return new NodeConst(match(TokenType.INT_VAL).getValore(), LangType.INT);
+            case FLOAT_VAL: // Val -> floatVal
+                // floatVal
+                return new NodeConst(match(TokenType.FLOAT_VAL).getValore(), LangType.FLOAT);
+            case ID: // Val -> id
+                // id
+                return new NodeDefer(new NodeId(match(TokenType.ID).getValore()));
+            default:
+                throw new SyntacticException(
+                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
+        }
+    }
 }

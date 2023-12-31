@@ -1,7 +1,5 @@
 package ast;
 
-import token.Token;
-
 public class NodeConst extends NodeExpr {
 
     private String value;
@@ -10,9 +8,6 @@ public class NodeConst extends NodeExpr {
     public NodeConst(String value, LangType type) {
         this.value = value;
         this.type = type;
-    }
-
-    public NodeConst(Token match) {
     }
 
     public String getValue() {

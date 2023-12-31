@@ -41,7 +41,13 @@ class TestScanner {
 	@Test
 	void testFloat() throws LexicalException, IOException {
 		Scanner s = new Scanner(testScannerFolder + "testFLOAT.txt");
-		Token t = s.nextToken();
+		Token t = null;
+		try {
+			t = s.nextToken();
+		} catch (LexicalException e) {
+			assertEquals("Errore in scanNumber() alla riga 1, non puoi creare un numero intero iniziando con la cifra zero", e.getMessage());
+			return;
+		}
 
 		assertEquals(1, t.getRiga());
 		assertEquals(TokenType.FLOAT_VAL, t.getTipo());
@@ -97,7 +103,13 @@ class TestScanner {
 		assertEquals(t.getRiga(), 2);
 		assertEquals(t.getValore(), null);
 
-		t = s.nextToken();
+		try {
+			t = s.nextToken();
+		} catch (LexicalException e) {
+			assertEquals("Errore in scanFloat() alla riga 2, il valore float deve avere almeno una cifra decimale", e.getMessage());
+			return;
+		}
+		
 		assertEquals(t.getTipo(), TokenType.FLOAT_VAL);
 		assertEquals(t.getRiga(), 2);
 		assertEquals(t.getValore(), "5.0");

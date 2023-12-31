@@ -4,5 +4,5 @@ public enum LangOper {
     PLUS,
     MINUS,
     MULT,
-    DIVIDE
+    DIVIDE, PLUS_ASSIGN
 }

@@ -1,12 +1,14 @@
-testParserCorretto1.txt,    testCorretto1
-testParserCorretto2.txt,    testCorretto2
-testParserEcc_0.txt,        testEcc0
-testParserEcc_1.txt,        testEcc1
-testParserEcc_2.txt,        testEcc2
-testParserEcc_3.txt,        testEcc3
-testParserEcc_4.txt,        testEcc4
-testParserEcc_5.txt,        testEcc5
-testParserEcc_6.txt,        testEcc6
-testParserEcc_7.txt,        testEcc7
-testSoloDichPrint1.txt,     testSoloDich1
-testSoloDichPrint2.txt,     testSoloDich2
+testParserCorretto1_old.txt,,    testCorretto1_old,,  null
+testParserCorretto2_old.txt,,    testCorretto2_old,,  null
+testParserCorretto1.txt,,        testCorretto1,,      null
+testParserCorretto2.txt,,        testCorretto2,,      null
+testParserEcc_0.txt,,            testEcc0,,           Token <SEMICOLON, riga:1> alla riga 1 non é quello giusto per scrivere uno statement
+testParserEcc_1.txt,,            testEcc1,,           Token <MULT, riga:2> alla riga 2
+testParserEcc_2.txt,,            testEcc2,,           Token <INT_VAL, riga:3, valore:1> non é il corretto primo token per un'istruzione alla riga 3
+testParserEcc_3.txt,,            testEcc3,,           Token <PLUS, riga:2> alla riga 2 non é quello giusto per scrivere uno statement
+testParserEcc_4.txt,,            testEcc4,,           Aspettavo un token di tipo ID e invece ho trovato un token di tipo INT_VAL alla riga 2
+testParserEcc_5.txt,,            testEcc5,,           Aspettavo un token di tipo ID e invece ho trovato un token di tipo INT_VAL alla riga 3
+testParserEcc_6.txt,,            testEcc6,,           Aspettavo un token di tipo ID e invece ho trovato un token di tipo FLOAT_KW alla riga 4
+testParserEcc_7.txt,,            testEcc7,,           Aspettavo un token di tipo ID e invece ho trovato un token di tipo ASSIGN alla riga 2
+testSoloDichPrint1.txt,,         testSoloDich1,,      null
+testSoloDichPrint2.txt,,         testSoloDich2,,      null
