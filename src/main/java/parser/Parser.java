@@ -145,7 +145,7 @@ public class Parser {
                 // TODO Tr
                 // TODO ExpP
                 break;
-            case EOF: // ExpP -> ϵ
+            case SEMICOLON: // ExpP -> ϵ
                 // TODO ϵ
                 break;
             default:
@@ -180,7 +180,7 @@ public class Parser {
                 // TODO Val
                 // TODO TrP
                 break;
-            case EOF: // TrP -> ϵ
+            case MINUS, PLUS, SEMICOLON: // TrP -> ϵ
                 // TODO ϵ
                 break;
             default:
