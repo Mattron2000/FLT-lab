@@ -41,7 +41,7 @@ public class Parser {
     private void parsePrg() throws SyntacticException, LexicalException, IOException {
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
-            case TokenType.FLOAT_KW, TokenType.INT_KW, TokenType.ID, TokenType.PRINT, TokenType.EOF: // Prg -> DSs $
+            case FLOAT_KW, INT_KW, ID, PRINT, EOF: // Prg -> DSs $
                 parseDSs();
                 match(TokenType.EOF);
                 break;
@@ -91,7 +91,7 @@ public class Parser {
             case SEMICOLON: // DclP -> ;
                 // TODO ;
                 break;
-            case ASSIGN: // DclP -> opAss Exp;
+            case ASSIGN: // DclP -> opAss Exp ;
                 // TODO opAss
                 // TODO Exp
                 break;
@@ -104,12 +104,12 @@ public class Parser {
     private void parseStm() throws SyntacticException, LexicalException, IOException {
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
-            case ID: // Stm -> id opAss Exp
+            case ID: // Stm -> id opAss Exp ;
                 // TODO id
                 // TODO opAss
                 // TODO Exp
                 break;
-            case PRINT: // Stm -> print id;
+            case PRINT: // Stm -> print id ;
                 // TODO print
                 // TODO id
                 break;
