@@ -1,9 +1,20 @@
 package parser;
 
 import java.io.IOException;
+import java.util.ArrayList;
+
+import ast.LangType;
+import ast.NodeDSs;
+import ast.NodeDcl;
+import ast.NodeExpr;
+import ast.NodeId;
+import ast.NodePrg;
+import ast.NodePrint;
+import ast.NodeStm;
 
 import scanner.LexicalException;
 import scanner.Scanner;
+
 import token.Token;
 import token.TokenType;
 
@@ -15,210 +26,252 @@ public class Parser {
         this.scanner = scanner;
     }
 
-    /**
-     * Check that the current token is the same TokenType of 'type'
-     * 
-     * @param type Expected TokenType
-     * @return current token
-     * @throws LexicalException
-     * @throws SyntacticException
-     * @throws IOException
-     */
-    private Token match(TokenType type) throws LexicalException, SyntacticException, IOException {
+    private Token match(TokenType tokenType) throws LexicalException, SyntacticException, IOException {
         Token tk = this.scanner.peekToken();
 
-        if (tk.getTipo().equals(type))
+        if (tk.getTipo().equals(tokenType))
             return this.scanner.nextToken();
         else
-            throw new SyntacticException("Aspettavo il tipo " + type.toString() + " e invece ho trovato "
-                    + tk.getTipo().toString() + " alla riga " + tk.getRiga());
+            throw new SyntacticException(
+                    "Aspettavo un token di tipo " + tokenType + " e invece ho trovato un token di tipo " + tk.getTipo()
+                            + " alla riga " + tk.getRiga());
     }
 
-    public void parse() throws SyntacticException, LexicalException, IOException {
-        this.parsePrg();
+    public NodePrg parse() throws SyntacticException, LexicalException, IOException {
+        return this.parsePrg();
     }
 
-    private void parsePrg() throws SyntacticException, LexicalException, IOException {
+    private NodePrg parsePrg() throws SyntacticException, LexicalException, IOException {
+        ArrayList<NodeDSs> DSsList = new ArrayList<>();
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
             case FLOAT_KW, INT_KW, ID, PRINT, EOF: // Prg -> DSs $
-                parseDSs();
+                // DSs
+                DSsList = parseDSs(DSsList);
+                // $
                 match(TokenType.EOF);
-                break;
+
+                return new NodePrg(DSsList);
             default:
                 throw new SyntacticException(
                         "Token " + tk.toString() + " alla riga " + tk.getRiga() + " non é inizio del programma");
         }
     }
 
-    private void parseDSs() throws SyntacticException, LexicalException, IOException {
+    private ArrayList<NodeDSs> parseDSs(ArrayList<NodeDSs> DSsList)
+            throws SyntacticException, LexicalException, IOException {
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
             case FLOAT_KW, INT_KW: // DSs -> Dcl DSs
-                // TODO Dcl
-                // TODO DSs
-                break;
+                // Dcl
+                NodeDcl nodeDcl = parseDcl();
+                DSsList.add(nodeDcl);
+                // DSs
+                DSsList = parseDSs(DSsList);
+
+                return DSsList;
             case ID, PRINT: // DSs -> Stm DSs
-                // TODO Stm
-                // TODO DSs
-                break;
+                // Stm
+                NodeStm nodeStm = parseStm();
+                DSsList.add(nodeStm);
+                // DSs
+                DSsList = parseDSs(DSsList);
+
+                return DSsList;
             case EOF: // DSs -> ϵ
-                // TODO ϵ
-                break;
+                // ϵ
+
+                return DSsList;
             default:
                 throw new SyntacticException(
-                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
+                        "Token " + tk.toString() + " non é il corretto primo token per un'istruzione alla riga "
+                                + tk.getRiga());
         }
     }
 
-    private void parseDcl() throws SyntacticException, LexicalException, IOException {
+    private NodeDcl parseDcl() throws SyntacticException, LexicalException, IOException {
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
             case FLOAT_KW, INT_KW: // Dcl -> Ty id DclP
-                // TODO Ty
-                // TODO id
-                // TODO DclP
-                break;
+                // Ty
+                LangType type = parseTy();
+                // id
+                NodeId id = new NodeId(match(TokenType.ID));
+                // DclP
+                NodeExpr expr = parseDclP();
+
+                return new NodeDcl(id, type, expr);
             default:
                 throw new SyntacticException(
-                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
+                        "Token " + tk.toString() + " alla riga " + tk.getRiga()
+                                + " non é il token corretto per dichiarare una variabile");
         }
     }
 
-    private void parseDclP() throws SyntacticException, LexicalException, IOException {
+    private NodeExpr parseDclP() throws SyntacticException, LexicalException, IOException {
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
             case SEMICOLON: // DclP -> ;
-                // TODO ;
-                break;
+                // ;
+                match(TokenType.SEMICOLON);
+
+                return null;
             case ASSIGN: // DclP -> opAss Exp ;
                 // TODO opAss
                 // TODO Exp
-                break;
+
+                return null;
             default:
                 throw new SyntacticException(
-                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
+                        "Token " + tk.toString() + " alla riga " + tk.getRiga()
+                                + " non é il tokn correto per assegnare un valore alla variabile");
         }
     }
 
-    private void parseStm() throws SyntacticException, LexicalException, IOException {
+    private NodeStm parseStm() throws SyntacticException, LexicalException, IOException {
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
             case ID: // Stm -> id opAss Exp ;
                 // TODO id
                 // TODO opAss
                 // TODO Exp
-                break;
+
+                return null;
             case PRINT: // Stm -> print id ;
-                // TODO print
-                // TODO id
-                break;
+                // print
+                match(TokenType.PRINT);
+                // id
+                NodeId idPrint = new NodeId(match(TokenType.ID));
+                // ;
+                match(TokenType.SEMICOLON);
+
+                return new NodePrint(idPrint);
             default:
                 throw new SyntacticException(
-                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
+                        "Token " + tk.toString() + " alla riga " + tk.getRiga() + " non é quello giusto per scrivere uno statement");
         }
     }
 
-    private void parseExp() throws SyntacticException, LexicalException, IOException {
-        Token tk = this.scanner.peekToken();
-        switch (tk.getTipo()) {
-            case ID, FLOAT_VAL, INT_VAL: // Exp -> Tr ExpP
-                // TODO Tr
-                // TODO ExpP
-                break;
-            default:
-                throw new SyntacticException(
-                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
-        }
-    }
+    // private NodeExpr parseExpr() throws SyntacticException, LexicalException,
+    // IOException {
+    // Token tk = this.scanner.peekToken();
+    // switch (tk.getTipo()) {
+    // case ID, FLOAT_VAL, INT_VAL: // Exp -> Tr ExpP
+    // // TODO Tr
+    // // TODO ExpP
 
-    private void parseExpP() throws SyntacticException, LexicalException, IOException {
-        Token tk = this.scanner.peekToken();
-        switch (tk.getTipo()) {
-            case PLUS: // ExpP -> + Tr ExpP
-                // TODO +
-                // TODO Tr
-                // TODO ExpP
-                break;
-            case MINUS: // ExpP -> - Tr ExpP
-                // TODO -
-                // TODO Tr
-                // TODO ExpP
-                break;
-            case SEMICOLON: // ExpP -> ϵ
-                // TODO ϵ
-                break;
-            default:
-                throw new SyntacticException(
-                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
-        }
-    }
+    // return null;
+    // default:
+    // throw new SyntacticException(
+    // "Token " + tk.toString() + " alla riga " + tk.getRiga());
+    // }
+    // }
 
-    private void parseTr() throws SyntacticException, LexicalException, IOException {
-        Token tk = this.scanner.peekToken();
-        switch (tk.getTipo()) {
-            case ID, FLOAT_VAL, INT_VAL: // Tr -> Val TrP
-                // TODO Val
-                // TODO TrP
-                break;
-            default:
-                throw new SyntacticException(
-                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
-        }
-    }
+    // private NodeExpr parseExprP() throws SyntacticException, LexicalException,
+    // IOException {
+    // Token tk = this.scanner.peekToken();
+    // switch (tk.getTipo()) {
+    // case PLUS: // ExpP -> + Tr ExpP
+    // // TODO +
+    // // TODO Tr
+    // // TODO ExpP
 
-    private void parseTrP() throws SyntacticException, LexicalException, IOException {
-        Token tk = this.scanner.peekToken();
-        switch (tk.getTipo()) {
-            case MULT: // TrP -> * Val TrP
-                // TODO *
-                // TODO Val
-                // TODO TrP
-                break;
-            case DIVIDE: // TrP -> / Val TrP
-                // TODO /
-                // TODO Val
-                // TODO TrP
-                break;
-            case MINUS, PLUS, SEMICOLON: // TrP -> ϵ
-                // TODO ϵ
-                break;
-            default:
-                throw new SyntacticException(
-                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
-        }
-    }
+    // return null;
+    // case MINUS: // ExpP -> - Tr ExpP
+    // // TODO -
+    // // TODO Tr
+    // // TODO ExpP
 
-    private void parseTy() throws SyntacticException, LexicalException, IOException {
+    // return null;
+    // case SEMICOLON: // ExpP -> ϵ
+    // // TODO ϵ
+
+    // return null;
+    // default:
+    // throw new SyntacticException(
+    // "Token " + tk.toString() + " alla riga " + tk.getRiga());
+    // }
+    // }
+
+    // private NodeExpr parseTr() throws SyntacticException, LexicalException,
+    // IOException {
+    // Token tk = this.scanner.peekToken();
+    // switch (tk.getTipo()) {
+    // case ID, FLOAT_VAL, INT_VAL: // Tr -> Val TrP
+    // // TODO Val
+    // // TODO TrP
+
+    // return null;
+    // default:
+    // throw new SyntacticException(
+    // "Token " + tk.toString() + " alla riga " + tk.getRiga());
+    // }
+    // }
+
+    // private NodeExpr parseTrP() throws SyntacticException, LexicalException,
+    // IOException {
+    // Token tk = this.scanner.peekToken();
+    // switch (tk.getTipo()) {
+    // case MULT: // TrP -> * Val TrP
+    // // TODO *
+    // // TODO Val
+    // // TODO TrP
+
+    // return null;
+    // case DIVIDE: // TrP -> / Val TrP
+    // // TODO /
+    // // TODO Val
+    // // TODO TrP
+
+    // return null;
+    // case MINUS, PLUS, SEMICOLON: // TrP -> ϵ
+    // // TODO ϵ
+
+    // return null;
+    // default:
+    // throw new SyntacticException(
+    // "Token " + tk.toString() + " alla riga " + tk.getRiga());
+    // }
+    // }
+
+    private LangType parseTy() throws SyntacticException, LexicalException, IOException {
         Token tk = this.scanner.peekToken();
         switch (tk.getTipo()) {
             case TokenType.FLOAT_KW: // Ty -> float
-                // TODO float
-                break;
+                // float
+                match(TokenType.FLOAT_KW);
+
+                return LangType.FLOAT;
             case TokenType.INT_KW: // Ty -> int
-                // TODO int
-                break;
+                // int
+                match(TokenType.INT_KW);
+
+                return LangType.INT;
             default:
                 throw new SyntacticException(
-                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
+                        "Token " + tk.toString() + " alla riga " + tk.getRiga() + " non é una keyword accettata");
         }
     }
 
-    private void parseVal() throws SyntacticException, LexicalException, IOException {
-        Token tk = this.scanner.peekToken();
-        switch (tk.getTipo()) {
-            case INT_VAL: // Val -> intVal
-                // TODO intVal
-                break;
-            case FLOAT_VAL: // Val -> floatVal
-                // TODO floatVal
-                break;
-            case ID: // Val -> id
-                // TODO id
-                break;
-            default:
-                throw new SyntacticException(
-                        "Token " + tk.toString() + " alla riga " + tk.getRiga());
-        }
-    }
+    // private void parseVal() throws SyntacticException, LexicalException,
+    // IOException {
+    // Token tk = this.scanner.peekToken();
+    // switch (tk.getTipo()) {
+    // case INT_VAL: // Val -> intVal
+    // // TODO intVal
+
+    // // return null;
+    // case FLOAT_VAL: // Val -> floatVal
+    // // TODO floatVal
+
+    // // return null;
+    // case ID: // Val -> id
+    // // TODO id
+
+    // // return null;
+    // default:
+    // throw new SyntacticException(
+    // "Token " + tk.toString() + " alla riga " + tk.getRiga());
+    // }
+    // }
 }

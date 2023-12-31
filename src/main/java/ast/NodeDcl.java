@@ -26,11 +26,11 @@ public class NodeDcl extends NodeDSs {
 
     @Override
     public String toString() {
-        String toString = "<Dcl, " + this.type + ", " + this.id.getValue();
+        String toString = "<" + this.type + "_KW>" + this.id.toString();
 
-        if (this.expr == null)
-            return toString + ">";
-        else
-            return toString + ", " + this.expr.toString() + ">";
+        if (this.expr != null)
+            toString += this.expr.toString();
+
+        return toString;
     }
 }
