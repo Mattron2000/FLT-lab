@@ -70,8 +70,6 @@ public class Scanner {
 		opAssHM.put("-=", TokenType.MINUS_ASSIGN);
 		opAssHM.put("*=", TokenType.MULT_ASSIGN);
 		opAssHM.put("/=", TokenType.DIVIDE_ASSIGN);
-		opAssHM.put("++", TokenType.INCREMENT);
-		opAssHM.put("--", TokenType.DECREMENT);
 	}
 
 	/**
@@ -173,9 +171,9 @@ public class Scanner {
 		sc = peekChar();
 
 		String s = fc.toString() + sc.toString();
-		if (opAssHM.containsKey(s)) {
-			sc = readChar();
-		} else
+		if (opAssHM.containsKey(s))
+			readChar();
+		else
 			s = fc.toString();
 
 		return new Token(opAssHM.get(s), riga);
@@ -232,19 +230,23 @@ public class Scanner {
 			c = peekChar();
 		} while (digits.contains(c));
 
-		if (sb.charAt(0) == '0' && sb.length() > 1)
-			throw new LexicalException("Errore in scanNumber() alla riga " + riga
-					+ ", non puoi creare un numero intero iniziando con la cifra zero");
-
 		if (c.equals('.')) {
 			readChar();
 			return new Token(TokenType.FLOAT_VAL, riga,
 					sb.toString() + c + scanFloat(sb).toString());
-		} else if (skipChars.contains(c) || opAssHM.containsKey(c.toString()))
-			return new Token(TokenType.INT_VAL, riga, sb.toString());
+		}
 
-		throw new LexicalException("Errore in scanNumber() alla riga " + riga + ", sono arrivato a '" + sb.toString()
-				+ "' ma ho trovato '" + c + "'");
+		if ((skipChars.contains(c) || opAssHM.containsKey(c.toString())))
+			if (sb.length() > 1 && sb.charAt(0) == '0')
+				throw new LexicalException(
+						"Errore in scanNumber() alla riga " + riga
+								+ ", non puoi scrivere un numero intero con uno zero davanti");
+			else
+				return new Token(TokenType.INT_VAL, riga, sb.toString());
+
+		throw new LexicalException(
+				"Errore in scanNumber() alla riga " + riga + ", sono arrivato a '" + sb.toString()
+						+ "' ma ho trovato '" + c + "'");
 	}
 
 	/**
@@ -270,19 +272,11 @@ public class Scanner {
 		if (letters.contains(c))
 			throw new LexicalException("Errore in scanFloat() alla riga " + riga + ", sono arrivato a '"
 					+ integerPart.toString() + '.' + sb.toString()
-					+ "' ma ho trovato '" + c + "'");
+					+ "' ma ho trovato una lettera alfabetica '" + c + "'");
 
-		if (sb.toString().length() == 0)
+		if (sb.toString().length() > 5)
 			throw new LexicalException("Errore in scanFloat() alla riga " + riga
-					+ ", il valore float deve avere almeno una cifra decimale");
-
-		if (sb.toString().length() > 4)
-			throw new LexicalException("Errore in scanFloat() alla riga " + riga
-					+ ", il valore float puó contenere fino a 4 cifre decimali numeriche");
-
-		if (sb.charAt(sb.length() - 1) == '0' && sb.length() > 1)
-			throw new LexicalException("Errore in scanFloat() alla riga " + riga
-					+ ", l'ultima cifra decimale del valore float non puó essere 0");
+					+ ", il valore float puó contenere fino a 5 cifre decimali numeriche");
 
 		return sb;
 	}

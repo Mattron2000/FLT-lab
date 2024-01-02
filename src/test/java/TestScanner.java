@@ -1,8 +1,14 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
 import scanner.LexicalException;
 import scanner.Scanner;
@@ -17,7 +23,7 @@ import token.TokenType;
 class TestScanner {
 
 	/**
-	 * percorso della cartella dove contiene tutti i file di testo 
+	 * percorso della cartella dove contiene tutti i file di testo
 	 */
 	private static final String testScannerFolder = System.getProperty("user.dir")
 			+ "/src/test/java/data/testScanner/";
@@ -45,28 +51,30 @@ class TestScanner {
 		try {
 			t = s.nextToken();
 		} catch (LexicalException e) {
-			assertEquals("Errore in scanNumber() alla riga 1, non puoi creare un numero intero iniziando con la cifra zero", e.getMessage());
+			assertEquals(
+					"Errore in scanNumber() alla riga 1, non puoi creare un numero intero iniziando con la cifra zero",
+					e.getMessage());
 			return;
 		}
 
 		assertEquals(1, t.getRiga());
 		assertEquals(TokenType.FLOAT_VAL, t.getTipo());
-		assertEquals("98.8095", t.getValore());
+		assertEquals("098.8095", t.getValore());
 
 		t = s.nextToken();
 		assertEquals(2, t.getRiga());
 		assertEquals(TokenType.FLOAT_VAL, t.getTipo());
-		assertEquals("0.0", t.getValore());
+		assertEquals("0.", t.getValore());
 
 		t = s.nextToken();
 		assertEquals(3, t.getRiga());
 		assertEquals(TokenType.FLOAT_VAL, t.getTipo());
-		assertEquals("98.0", t.getValore());
+		assertEquals("98.", t.getValore());
 
 		t = s.nextToken();
 		assertEquals(5, t.getRiga());
 		assertEquals(TokenType.FLOAT_VAL, t.getTipo());
-		assertEquals("89.9999", t.getValore());
+		assertEquals("89.99999", t.getValore());
 
 		t = s.nextToken();
 		assertEquals(5, t.getRiga());
@@ -106,13 +114,14 @@ class TestScanner {
 		try {
 			t = s.nextToken();
 		} catch (LexicalException e) {
-			assertEquals("Errore in scanFloat() alla riga 2, il valore float deve avere almeno una cifra decimale", e.getMessage());
+			assertEquals("Errore in scanFloat() alla riga 2, il valore float deve avere almeno una cifra decimale",
+					e.getMessage());
 			return;
 		}
-		
+
 		assertEquals(t.getTipo(), TokenType.FLOAT_VAL);
 		assertEquals(t.getRiga(), 2);
-		assertEquals(t.getValore(), "5.0");
+		assertEquals(t.getValore(), "5.");
 
 		t = s.nextToken();
 		assertEquals(t.getTipo(), TokenType.SEMICOLON);
@@ -394,53 +403,30 @@ class TestScanner {
 		assertEquals(t.getValore(), null);
 	}
 
-	@Test
-	void testErroriNumbers() throws LexicalException, IOException {
-		Scanner s = null;
+	@TestFactory
+	public Stream<DynamicTest> generateDynamicTestErroriNumbers() {
+		ArrayList<DynamicTest> dynamicTests = new ArrayList<>();
+
+		String[] expectedExceptionMessageList = {
+				"Errore in scanNumber() alla riga 1, non puoi scrivere un numero intero con uno zero davanti",
+				"Errore in scanNumber() alla riga 2, sono arrivato a '123' ma ho trovato 'a'",
+				"Errore in scanFloat() alla riga 3, sono arrivato a '12.' ma ho trovato una lettera alfabetica 'a'",
+				"Errore in scanFloat() alla riga 4, il valore float puó contenere fino a 5 cifre decimali numeriche"
+		};
 
 		for (int i = 1; i <= 4; i++) {
-			s = new Scanner(testScannerFolder + "erroriNumbers/erroriNumbers" + i + ".txt");
+			String fileName = "erroriNumbers/erroriNumbers" + i + ".txt";
+			String testName = "erroriNumbers" + i;
+			String expectedExceptionMessage = expectedExceptionMessageList[i - 1];
 
-			switch (i) {
-				case 1:
-					try {
-						s.nextToken();
-					} catch (LexicalException e) {
-						System.out.println(e.getMessage());
-						assertEquals(
-								"Errore in scanNumber() alla riga 1, non puoi creare un numero intero iniziando con la cifra zero",
-								e.getMessage());
-					}
-					break;
-				case 2:
-					try {
-						s.nextToken();
-					} catch (LexicalException e) {
-						System.out.println(e.getMessage());
-						assertEquals("Errore in scanNumber() alla riga 2, sono arrivato a '123' ma ho trovato 'a'",
-								e.getMessage());
-					}
-					break;
-				case 3:
-					try {
-						s.nextToken();
-					} catch (LexicalException e) {
-						System.out.println(e.getMessage());
-						assertEquals("Errore in scanFloat() alla riga 3, sono arrivato a '12.' ma ho trovato 'a'",
-								e.getMessage());
-					}
-					break;
-				case 4:
-					try {
-						s.nextToken();
-					} catch (LexicalException e) {
-						System.out.println(e.getMessage());
-						assertEquals(
-								"Errore in scanFloat() alla riga 4, il valore float puó contenere fino a 4 cifre decimali numeriche",
-								e.getMessage());
-					}
-					break;
-			}
+			dynamicTests.add(dynamicTest(testName, () -> {
+				Scanner s = new Scanner(testScannerFolder + fileName);
+				Throwable e = assertThrows(LexicalException.class, () -> s.nextToken());
+				System.out.println(e.getMessage());
+				assertEquals(expectedExceptionMessage, e.getMessage());
+			}));
 		}
+
+		return dynamicTests.stream();
 	}
 }
