@@ -57,48 +57,4 @@ class TestParser {
 
 		return dynamicTests.stream();
 	}
-
-	// @Test
-	// public void testSoloDclPrint1() throws SyntacticException, LexicalException,
-	// IOException {
-	// Scanner s = new Scanner(RootFolderOfJavaProject + "testSoloDichPrint1.txt");
-	// Parser p = new Parser(s);
-
-	// NodePrg nodePrg = p.parse();
-
-	// System.out.println(nodePrg.toString());
-	// }
-
-	// @Test
-	// public void testSoloDclPrint2() throws SyntacticException, LexicalException,
-	// IOException {
-	// Scanner s = new Scanner(RootFolderOfJavaProject + "testSoloDichPrint2.txt");
-	// Parser p = new Parser(s);
-
-	// NodePrg nodePrg = p.parse();
-
-	// System.out.println(nodePrg.toString());
-	// }
-
-	// @Test
-	// public void testCorretto1() throws SyntacticException, LexicalException,
-	// IOException {
-	// Scanner s = new Scanner(RootFolderOfJavaProject + "testParserCorretto1.txt");
-	// Parser p = new Parser(s);
-
-	// NodePrg nodePrg = p.parse();
-
-	// System.out.println(nodePrg.toString());
-	// }
-
-	// @Test
-	// public void testCorretto2() throws SyntacticException, LexicalException,
-	// IOException {
-	// Scanner s = new Scanner(RootFolderOfJavaProject + "testParserCorretto2.txt");
-	// Parser p = new Parser(s);
-
-	// NodePrg nodePrg = p.parse();
-
-	// System.out.println(nodePrg.toString());
-	// }
 }
