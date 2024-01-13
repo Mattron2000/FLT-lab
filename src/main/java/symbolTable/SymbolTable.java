@@ -27,10 +27,10 @@ public class SymbolTable {
 
 	public static String toStr() {
 		StringBuilder res = new StringBuilder("~ SYMBOL TABLE ~\n");
-
+		
 		for (HashMap.Entry<String, Attributes> entry : table.entrySet())
-			res.append(entry.getKey() + "\t" + entry.getValue() + "\n");
-
+		res.append(entry.getKey() + "\t" + entry.getValue() + "\n");
+		
 		return res.toString();
 	}
 
