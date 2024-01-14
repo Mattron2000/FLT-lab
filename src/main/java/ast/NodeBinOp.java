@@ -1,6 +1,7 @@
 package ast;
 
 import visitor.IVisitor;
+import visitor.SemanticException;
 
 /**
  * @author Palmieri Matteo
@@ -23,10 +24,18 @@ public class NodeBinOp extends NodeExpr {
     public NodeExpr getLeft() {
         return this.left;
     }
+	
+	public void setLeft(NodeExpr left) {
+		this.left = left;
+	}
 
     public NodeExpr getRight() {
         return this.right;
     }
+
+	public void setRight(NodeExpr right) {
+		this.right = right;
+	}
 
     @Override
     public String toString() {
@@ -45,7 +54,7 @@ public class NodeBinOp extends NodeExpr {
     }
 
 	@Override
-    public void accept(IVisitor visitor) {
+    public void accept(IVisitor visitor) throws SemanticException {
         visitor.visit(this);
     }
 }

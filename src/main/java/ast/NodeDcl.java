@@ -1,6 +1,7 @@
 package ast;
 
 import visitor.IVisitor;
+import visitor.SemanticException;
 
 /**
  * @author Palmieri Matteo
@@ -25,7 +26,7 @@ public class NodeDcl extends NodeDSs {
         return this.type;
     }
 
-    public NodeExpr getexpr() {
+    public NodeExpr getExpr() {
         return this.expr;
     }
 
@@ -40,7 +41,7 @@ public class NodeDcl extends NodeDSs {
     }
 
 	@Override
-    public void accept(IVisitor visitor) {
+    public void accept(IVisitor visitor) throws SemanticException {
         visitor.visit(this);
     }
 }
