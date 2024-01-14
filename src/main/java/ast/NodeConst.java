@@ -1,5 +1,10 @@
 package ast;
 
+import visitor.IVisitor;
+
+/**
+ * @author Palmieri Matteo
+ */
 public class NodeConst extends NodeExpr {
 
     private String value;
@@ -21,5 +26,10 @@ public class NodeConst extends NodeExpr {
     @Override
     public String toString() {
         return "<CONST, " + this.type + ", " + this.value + ">";
+    }
+
+	@Override
+    public void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }

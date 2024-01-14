@@ -1,5 +1,8 @@
-package parser;
+package ast;
 
+/**
+ * @author Palmieri Matteo
+ */
 public enum LangOperAss {
     PLUS_ASSIGN,
     MINUS_ASSIGN,

@@ -1,5 +1,8 @@
 package token;
 
+/**
+ * @author Palmieri Matteo
+ */
 public enum TokenType {
     INT_VAL,
     FLOAT_VAL,

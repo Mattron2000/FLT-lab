@@ -1,0 +1,7 @@
+1_dicRipetute.txt,,         dicRipetute,,           null
+2_idNonDec.txt,,            idNonDec,,              null
+3_idNonDec,,                idNonDec,,              null
+4_tipoNonCompatibile.txt,,  tipoNonCompatibile,,    null
+5_corretto.txt,,            5_corretto,,            null
+6_corretto.txt,,            6_corretto,,            null
+7_corretto.txt,,            7_corretto,,            null

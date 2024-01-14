@@ -1,5 +1,10 @@
 package ast;
 
+import visitor.IVisitor;
+
+/**
+ * @author Palmieri Matteo
+ */
 public class NodeDcl extends NodeDSs {
 
     private NodeId id;
@@ -32,5 +37,10 @@ public class NodeDcl extends NodeDSs {
             toString += this.expr.toString();
 
         return toString;
+    }
+
+	@Override
+    public void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }

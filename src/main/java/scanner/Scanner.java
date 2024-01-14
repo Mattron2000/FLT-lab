@@ -13,6 +13,8 @@ import token.TokenType;
 
 /**
  * componente per la scansione di file di testo di input per generare token
+ * 
+ * @author Palmieri Matteo
  */
 public class Scanner {
 	private int riga = 1;

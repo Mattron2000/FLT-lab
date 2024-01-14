@@ -1,17 +1,22 @@
 package ast;
 
+import visitor.IVisitor;
+
+/**
+ * @author Palmieri Matteo
+ */
 public class NodeBinOp extends NodeExpr {
 
-    private LangOper op;
+    private LangBinOp op;
     private NodeExpr left, right;
 
-    public NodeBinOp(LangOper op, NodeExpr left, NodeExpr right) {
+    public NodeBinOp(LangBinOp op, NodeExpr left, NodeExpr right) {
         this.op = op;
         this.left = left;
         this.right = right;
     }
 
-    public LangOper getOp() {
+    public LangBinOp getOp() {
         return this.op;
     }
 
@@ -37,5 +42,10 @@ public class NodeBinOp extends NodeExpr {
             toString += this.right.toString();
 
         return toString;
+    }
+
+	@Override
+    public void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }

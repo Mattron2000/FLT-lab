@@ -1,5 +1,7 @@
 package ast;
 
+import visitor.IVisitor;
+
 /**
  * @author Palmieri Matteo
  */
@@ -17,6 +19,11 @@ public class NodeConvert extends NodeExpr {
 
 	@Override
 	public String toString() {
-		return this.node.toString();
+		return "<CONVERT," + this.node.toString() + ">";
+	}
+
+	@Override
+	public void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }

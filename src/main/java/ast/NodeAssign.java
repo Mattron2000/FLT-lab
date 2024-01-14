@@ -1,7 +1,10 @@
 package ast;
 
-import parser.LangOperAss;
+import visitor.IVisitor;
 
+/**
+ * @author Palmieri Matteo
+ */
 public class NodeAssign extends NodeStm {
 
     private NodeId id;
@@ -29,5 +32,10 @@ public class NodeAssign extends NodeStm {
     @Override
     public String toString() {
         return this.id.toString() + "<" + this.langOperAss + ">" + this.expr.toString();
+    }
+
+	@Override
+    public void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }

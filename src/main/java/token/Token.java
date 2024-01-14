@@ -1,5 +1,8 @@
 package token;
 
+/**
+ * @author Palmieri Matteo
+ */
 public class Token {
 	
 	private int riga;
@@ -44,5 +47,4 @@ public class Token {
 					", riga:" + riga +
 					'>';
 	}
-	
 }
