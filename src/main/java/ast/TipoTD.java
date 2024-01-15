@@ -1,4 +1,4 @@
-package visitor;
+package ast;
 
 public enum TipoTD {
 	INT,

@@ -1,6 +1,6 @@
-1_dicRipetute.txt,,         dicRipetute,,           null
-2_idNonDec.txt,,            idNonDec,,              null
-3_idNonDec,,                idNonDec,,              null
+1_dicRipetute.txt,,         dicRipetute,,           NodeId: l'ID 'a' non é definito, NodeDcl: l'ID 'a' é giá definito
+2_idNonDec.txt,,            idNonDec,,              NodeId: l'ID 'a' non é definito, NodeId: l'ID 'b' non é definito, PRINT: l'ID 'b' non é definito
+3_idNonDec.txt,,            idNonDec2,,             NodeId: l'ID 'b' non é definito, NodeId: l'ID 'temp' non é definito, NodeId: l'ID 'c' non é definito
 4_tipoNonCompatibile.txt,,  tipoNonCompatibile,,    null
 5_corretto.txt,,            5_corretto,,            null
 6_corretto.txt,,            6_corretto,,            null

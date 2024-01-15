@@ -1,5 +1,4 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 import java.io.BufferedReader;
@@ -15,11 +14,11 @@ import org.junit.jupiter.api.TestFactory;
 import ast.NodePrg;
 
 import parser.Parser;
-import parser.SyntacticException;
 
 import scanner.Scanner;
 
-import visitor.IVisitor;
+import symbolTable.SymbolTable;
+
 import visitor.TypeCheckingVisitor;
 
 class TestVisitor {
@@ -43,30 +42,20 @@ class TestVisitor {
 				dynamicTests.add(dynamicTest(testName, () -> {
 					Scanner s = new Scanner(RootFolderOfJavaProject + fileName);
 					Parser p = new Parser(s);
-
-					if (!expectedExceptionMessage.equals("null")) {
-						Throwable e = assertThrows(SyntacticException.class, () -> {
-							NodePrg nodePrg = p.parse();
-
-							TypeCheckingVisitor visitor = new TypeCheckingVisitor();
-
-							nodePrg.accept(visitor);
-
-							visitor.getResType(); // visitor.visit(nodePrg);
-						});
-						assertEquals(expectedExceptionMessage, e.getMessage());
-						return;
-					}
-
 					NodePrg nodePrg = p.parse();
 
 					TypeCheckingVisitor visitor = new TypeCheckingVisitor();
 
 					nodePrg.accept(visitor);
 
-					visitor.getResType(); // visitor.visit(nodePrg);
+					System.out.println(nodePrg.getResType() + "\n" + nodePrg.toString());
+					System.out.println(SymbolTable.toStr());
+					System.out.println("Visitor LOG:\n" + visitor.getLog());
 
-					System.out.println(nodePrg.toString());
+					assertEquals(expectedExceptionMessage, visitor.getLog());
+
+					// if (nodePrg.getResType() == TipoTD.ERROR)
+					// assertEquals(expectedExceptionMessage, visitor.getLog());
 				}));
 			}
 		} catch (IOException e) {
