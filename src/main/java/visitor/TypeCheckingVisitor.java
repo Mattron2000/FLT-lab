@@ -62,8 +62,9 @@ public class TypeCheckingVisitor implements IVisitor {
 
 		node.setResType(TipoTD.ERROR);
 
-		if((id.getResType() == TipoTD.FLOAT && expr.getResType() == TipoTD.INT) || (id.getResType() == TipoTD.INT && expr.getResType() == TipoTD.FLOAT))
-			setLog("NodeAssign: l'ID '" + id.toString() + "' di tipo '"+ id.getResType() + "' non é compatibile con l'Expr '" + expr.toString() + "'");
+		if (id.getResType() == TipoTD.INT && expr.getResType() == TipoTD.FLOAT)
+			setLog("NodeAssign: l'ID '" + id.toString() + "' di tipo '" + id.getResType()
+					+ "' non é compatibile con l'Expr '" + expr.toString() + "'");
 	}
 
 	@Override
@@ -123,13 +124,36 @@ public class TypeCheckingVisitor implements IVisitor {
 		if (id.getResType() == TipoTD.INT || id.getResType() == TipoTD.FLOAT) {
 			node.setResType(TipoTD.ERROR);
 			setLog("NodeDcl: l'ID '" + id.getValue() + "' é giá definito");
-		} else { // altrimenti inserisci l’identificatore nella Symbol Table con associato il suo
-					// tipo
-			Attributes attr = new Attributes(node.getType());
-			id.setDefinition(attr);
-			SymbolTable.enter(id.getValue(), attr);
-			node.setResType(TipoTD.OK);
+			return;
 		}
+		// altrimenti inserisci l’identificatore nella Symbol Table con associato il suo
+		// tipo
+		Attributes attr = new Attributes(node.getType());
+		id.setDefinition(attr);
+
+		switch (attr.getType()) {
+			case FLOAT:
+				id.setResType(TipoTD.FLOAT);
+				break;
+			case INT:
+				id.setResType(TipoTD.INT);
+		}
+
+		SymbolTable.enter(id.getValue(), attr);
+		node.setResType(TipoTD.OK);
+
+		if (expr == null || (id.getResType() == expr.getResType() && id.getResType() != TipoTD.ERROR))
+			return;
+
+		if (id.getResType() == TipoTD.FLOAT && expr.getResType() == TipoTD.INT) {
+			node.setExpr(this.convert(expr));
+			return;
+		}
+
+		node.setResType(TipoTD.ERROR);
+
+		setLog("NodeDcl: l'ID '" + id.toString() + "' di tipo '" + id.getResType()
+				+ "' non é compatibile con l'Expr '" + expr.toString() + "'");
 	}
 
 	@Override
