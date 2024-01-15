@@ -1,5 +1,6 @@
 package ast;
 
+import token.TokenType;
 import visitor.IVisitor;
 
 /**
@@ -7,16 +8,16 @@ import visitor.IVisitor;
  */
 public class NodeBinOp extends NodeExpr {
 
-    private LangBinOp op;
+    private TokenType op;
     private NodeExpr left, right;
 
-    public NodeBinOp(LangBinOp op, NodeExpr left, NodeExpr right) {
+    public NodeBinOp(TokenType op, NodeExpr left, NodeExpr right) {
         this.op = op;
         this.left = left;
         this.right = right;
     }
 
-    public LangBinOp getOp() {
+    public TokenType getOp() {
         return this.op;
     }
 

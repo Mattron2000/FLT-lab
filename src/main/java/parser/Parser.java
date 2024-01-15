@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
-import ast.LangBinOp;
 import ast.LangOperAss;
 import ast.LangType;
 import ast.NodeAssign;
@@ -237,7 +236,7 @@ public class Parser {
 				// Tr
 				NodeExpr rightPlus = parseTr();
 				// ExpP
-				NodeExpr exprPlus = parseExprP(new NodeBinOp(LangBinOp.PLUS, left, rightPlus));
+				NodeExpr exprPlus = parseExprP(new NodeBinOp(TokenType.PLUS, left, rightPlus));
 
 				return exprPlus;
 			case MINUS: // ExpP -> - Tr ExpP
@@ -246,7 +245,7 @@ public class Parser {
 				// Tr
 				NodeExpr rightMinus = parseTr();
 				// ExpP
-				NodeExpr exprMinus = parseExprP(new NodeBinOp(LangBinOp.MINUS, left, rightMinus));
+				NodeExpr exprMinus = parseExprP(new NodeBinOp(TokenType.MINUS, left, rightMinus));
 
 				return exprMinus;
 			case SEMICOLON: // ExpP -> ϵ
@@ -282,18 +281,18 @@ public class Parser {
 				// *
 				match(TokenType.MULT);
 				// Val
-				NodeExpr valMult = parseVal();
+				NodeExpr rightMult = parseVal();
 				// TrP
-				NodeExpr exprMult = parseTrP(valMult);
+				NodeExpr exprMult = parseTrP(new NodeBinOp(TokenType.MULT, left, rightMult));
 
 				return exprMult;
 			case DIVIDE: // TrP -> / Val TrP
 				// /
 				match(TokenType.DIVIDE);
 				// Val
-				NodeExpr valDivide = parseVal();
+				NodeExpr rightDivide = parseVal();
 				// TrP
-				NodeExpr exprDivide = parseTrP(valDivide);
+				NodeExpr exprDivide = parseTrP(new NodeBinOp(TokenType.DIVIDE, left, rightDivide));
 
 				return exprDivide;
 			case MINUS, PLUS, SEMICOLON: // TrP -> ϵ
