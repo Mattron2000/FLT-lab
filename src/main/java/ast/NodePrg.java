@@ -3,7 +3,6 @@ package ast;
 import java.util.ArrayList;
 
 import visitor.IVisitor;
-import visitor.SemanticException;
 
 /**
  * @author Palmieri Matteo
@@ -31,7 +30,7 @@ public class NodePrg extends NodeAST {
     }
 
 	@Override
-    public void accept(IVisitor visitor) throws SemanticException {
+    public void accept(IVisitor visitor) {
         visitor.visit(this);
     }
 }

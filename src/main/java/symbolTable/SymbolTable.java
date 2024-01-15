@@ -14,9 +14,9 @@ public class SymbolTable {
 	}
 
 	public static boolean enter(String id, Attributes entry) {
-		if (table.get(id) != null)
+		Attributes value = table.get(id);
+		if (value != null)
 			return false;
-		
 		table.put(id, entry);
 		return true;
 	}
@@ -26,15 +26,15 @@ public class SymbolTable {
 	}
 
 	public static String toStr() {
-		StringBuilder res = new StringBuilder("~ SYMBOL TABLE ~\n");
-		
+		StringBuilder res = new StringBuilder("symbol table\n=============\n");
+
 		for (HashMap.Entry<String, Attributes> entry : table.entrySet())
-		res.append(entry.getKey() + "\t" + entry.getValue() + "\n");
-		
+			res.append(entry.getKey() + "   \t" + entry.getValue() + "\n");
+
 		return res.toString();
 	}
 
 	public static int size() {
-		return table.size();
+		return (table.size());
 	}
 }

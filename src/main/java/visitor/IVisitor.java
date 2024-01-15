@@ -11,13 +11,13 @@ import ast.NodePrg;
 import ast.NodePrint;
 
 public abstract interface IVisitor {
-    public abstract void visit(NodeAssign node) throws SemanticException;
-    public abstract void visit(NodeBinOp node) throws SemanticException;
+    public abstract void visit(NodeAssign node);
+    public abstract void visit(NodeBinOp node);
     public abstract void visit(NodeConst node);
-    public abstract void visit(NodeDcl node) throws SemanticException;
-    public abstract void visit(NodeDefer node) throws SemanticException;
-    public abstract void visit(NodeId node) throws SemanticException;
-    public abstract void visit(NodePrg node) throws SemanticException;
-    public abstract void visit(NodePrint node) throws SemanticException;
-    public abstract void visit(NodeConvert node) throws SemanticException;
+    public abstract void visit(NodeDcl node);
+    public abstract void visit(NodeDefer node);
+    public abstract void visit(NodeId node);
+    public abstract void visit(NodePrg node);
+    public abstract void visit(NodePrint node);
+    public abstract void visit(NodeConvert node);
 }
