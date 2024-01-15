@@ -4,9 +4,11 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
+import ast.LangBinOp;
 import ast.LangOperAss;
 import ast.LangType;
 import ast.NodeAssign;
+import ast.NodeBinOp;
 import ast.NodeConst;
 import ast.NodeDSs;
 import ast.NodeDcl;
@@ -233,18 +235,18 @@ public class Parser {
 				// +
 				match(TokenType.PLUS);
 				// Tr
-				NodeExpr leftPlus = parseTr();
+				NodeExpr rightPlus = parseTr();
 				// ExpP
-				NodeExpr exprPlus = parseExprP(leftPlus);
+				NodeExpr exprPlus = parseExprP(new NodeBinOp(LangBinOp.PLUS, left, rightPlus));
 
 				return exprPlus;
 			case MINUS: // ExpP -> - Tr ExpP
 				// -
 				match(TokenType.MINUS);
 				// Tr
-				NodeExpr leftMinus = parseTr();
+				NodeExpr rightMinus = parseTr();
 				// ExpP
-				NodeExpr exprMinus = parseExprP(leftMinus);
+				NodeExpr exprMinus = parseExprP(new NodeBinOp(LangBinOp.MINUS, left, rightMinus));
 
 				return exprMinus;
 			case SEMICOLON: // ExpP -> ϵ

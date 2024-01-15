@@ -28,78 +28,76 @@ public class TypeCheckingVisitor implements IVisitor {
 		return this.log.toString();
 	}
 
-	// private NodeExpr convert(NodeExpr node) {
-	// NodeExpr expr = new NodeConvert(node);
-	// expr.setResType(TipoTD.FLOAT);
+	private NodeExpr convert(NodeExpr node) {
+		NodeExpr expr = new NodeConvert(node);
+		expr.setResType(TipoTD.FLOAT);
 
-	// return expr;
-	// }
+		return expr;
+	}
 
 	@Override
 	public void visit(NodeAssign node) {
-		// NodeId id = node.getId();
-		// NodeExpr expr = node.getExpr();
+		NodeId id = node.getId();
+		NodeExpr expr = node.getExpr();
 
-		// id.accept(this);
-		// expr.accept(this);
+		id.accept(this);
+		expr.accept(this);
 
-		// if ((id.getResType() == TipoTD.INT && expr.getResType() == TipoTD.INT) ||
-		// (id.getResType() == TipoTD.FLOAT && expr.getResType() == TipoTD.FLOAT)) {
-		// node.setResType(TipoTD.OK);
-		// return;
-		// }
+		if ((id.getResType() == TipoTD.INT && expr.getResType() == TipoTD.INT) ||
+				(id.getResType() == TipoTD.FLOAT && expr.getResType() == TipoTD.FLOAT)) {
+			node.setResType(TipoTD.OK);
+			return;
+		}
 
-		// if ((id.getResType() == TipoTD.FLOAT && expr.getResType() == TipoTD.INT)) {
-		// node.setExpr(this.convert(expr));
-		// node.setResType(TipoTD.OK);
-		// return;
-		// }
+		if ((id.getResType() == TipoTD.FLOAT && expr.getResType() == TipoTD.INT)) {
+			node.setExpr(this.convert(expr));
+			node.setResType(TipoTD.OK);
+			return;
+		}
 
-		// node.setResType(TipoTD.ERROR);
+		node.setResType(TipoTD.ERROR);
 	}
 
 	@Override
 	public void visit(NodeBinOp node) {
-		// NodeExpr exprLeft = node.getLeft();
-		// NodeExpr exprRight = node.getRight();
+		NodeExpr exprLeft = node.getLeft();
+		NodeExpr exprRight = node.getRight();
 
-		// exprLeft.accept(this);
-		// exprRight.accept(this);
+		exprLeft.accept(this);
+		exprRight.accept(this);
 
-		// if (exprLeft.getResType().equals(exprRight.getResType())) {
-		// node.setResType(exprLeft.getResType());
-		// return;
-		// }
+		if (exprLeft.getResType().equals(exprRight.getResType())) {
+			node.setResType(exprLeft.getResType());
+			return;
+		}
 
-		// if (exprLeft.getResType() == TipoTD.INT && exprRight.getResType() ==
-		// TipoTD.FLOAT) {
-		// node.setLeft(this.convert(exprLeft));
-		// node.setResType(TipoTD.FLOAT);
-		// return;
-		// }
+		if (exprLeft.getResType() == TipoTD.INT && exprRight.getResType() == TipoTD.FLOAT) {
+			node.setLeft(this.convert(exprLeft));
+			node.setResType(TipoTD.FLOAT);
+			return;
+		}
 
-		// if (exprLeft.getResType() == TipoTD.FLOAT && exprRight.getResType() ==
-		// TipoTD.INT) {
-		// node.setRight(this.convert(exprRight));
-		// node.setResType(TipoTD.FLOAT);
-		// return;
-		// }
+		if (exprLeft.getResType() == TipoTD.FLOAT && exprRight.getResType() == TipoTD.INT) {
+			node.setRight(this.convert(exprRight));
+			node.setResType(TipoTD.FLOAT);
+			return;
+		}
 
-		// node.setResType(TipoTD.ERROR);
+		node.setResType(TipoTD.ERROR);
 	}
 
 	@Override
 	public void visit(NodeConst node) {
-		// switch (node.getLangType()) {
-		// case INT:
-		// node.setResType(TipoTD.INT);
-		// break;
-		// case FLOAT:
-		// node.setResType(TipoTD.FLOAT);
-		// break;
-		// default:
-		// node.setResType(TipoTD.ERROR);
-		// }
+		switch (node.getLangType()) {
+			case INT:
+				node.setResType(TipoTD.INT);
+				break;
+			case FLOAT:
+				node.setResType(TipoTD.FLOAT);
+				break;
+			default:
+				node.setResType(TipoTD.ERROR);
+		}
 	}
 
 	@Override
@@ -130,11 +128,17 @@ public class TypeCheckingVisitor implements IVisitor {
 
 	@Override
 	public void visit(NodeDefer node) {
-		// NodeId id = node.getId();
+		NodeId id = node.getId();
 
-		// id.accept(this);
+		id.accept(this);
 
-		// node.setResType(id.getResType());
+		node.setResType(id.getResType());
+
+		if(node.getResType() == TipoTD.ERROR){
+			if (!this.log.toString().equals(""))
+				this.log.append(", ");
+			this.log.append("NodeDefer: l'ID '" + id.getValue() + "' non é definito");
+		}
 	}
 
 	@Override

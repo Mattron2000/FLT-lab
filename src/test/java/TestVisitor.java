@@ -43,14 +43,15 @@ class TestVisitor {
 					Scanner s = new Scanner(RootFolderOfJavaProject + fileName);
 					Parser p = new Parser(s);
 					NodePrg nodePrg = p.parse();
-
+					
 					TypeCheckingVisitor visitor = new TypeCheckingVisitor();
-
+					
 					nodePrg.accept(visitor);
-
-					System.out.println(nodePrg.getResType() + "\n" + nodePrg.toString());
+					
+					System.out.println("\n=== " + testName + " ===");
+					System.out.println("ResType: " + nodePrg.getResType() + "\n" + nodePrg.toString());
 					System.out.println(SymbolTable.toStr());
-					System.out.println("Visitor LOG:\n" + visitor.getLog());
+					System.out.println("Visitor LOG:\n\t" + visitor.getLog());
 
 					assertEquals(expectedExceptionMessage, visitor.getLog());
 

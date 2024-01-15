@@ -34,7 +34,7 @@ public class NodeDcl extends NodeDSs {
         String toString = "<" + this.type + "_KW>" + this.id.toString();
 
         if (this.expr != null)
-            toString += this.expr.toString();
+            toString += "<ASSIGN>" + this.expr.toString();
 
         return toString;
     }
