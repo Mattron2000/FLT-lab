@@ -54,9 +54,6 @@ class TestVisitor {
 					System.out.println("Visitor LOG:\n\t" + visitor.getLog());
 
 					assertEquals(expectedExceptionMessage, visitor.getLog());
-
-					// if (nodePrg.getResType() == TipoTD.ERROR)
-					// assertEquals(expectedExceptionMessage, visitor.getLog());
 				}));
 			}
 		} catch (IOException e) {

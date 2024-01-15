@@ -1,7 +1,7 @@
 1_dicRipetute.txt,,         dicRipetute,,           NodeId: l'ID 'a' non é definito, NodeDcl: l'ID 'a' é giá definito
 2_idNonDec.txt,,            idNonDec,,              NodeId: l'ID 'a' non é definito, NodeId: l'ID 'b' non é definito, PRINT: l'ID 'b' non é definito
 3_idNonDec.txt,,            idNonDec2,,             NodeId: l'ID 'b' non é definito, NodeId: l'ID 'temp' non é definito, NodeId: l'ID 'c' non é definito, NodeDefer: l'ID 'c' non é definito
-4_tipoNonCompatibile.txt,,  tipoNonCompatibile,,    null
-5_corretto.txt,,            5_corretto,,            null
-6_corretto.txt,,            6_corretto,,            null
-7_corretto.txt,,            7_corretto,,            null
+4_tipoNonCompatibile.txt,,  tipoNonCompatibile,,    NodeId: l'ID 'b' non é definito, NodeAssign: l'ID '<ID, b>' di tipo 'INT' non é compatibile con l'Expr '<CONST, FLOAT, 0.1>'
+5_corretto.txt,,            5_corretto,,            NodeId: l'ID 'a' non é definito, NodeId: l'ID 'b' non é definito
+6_corretto.txt,,            6_corretto,,			NodeId: l'ID 'a' non é definito, NodeId: l'ID 'b' non é definito
+7_corretto.txt,,            7_corretto,,            NodeId: l'ID 'a' non é definito, NodeId: l'ID 'b' non é definito, NodeId: l'ID 'temp' non é definito
