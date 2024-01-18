@@ -10,15 +10,13 @@ import ast.NodeDefer;
 import ast.NodeId;
 import ast.NodePrg;
 import ast.NodePrint;
+import ast.TypeDescriptor;
 
 public class CodeGenerationVisitor extends IVisitor {
-
-	private StringBuffer codiceDc; // mantiene il codice della visita
 
 	public CodeGenerationVisitor() {
 		super();
 		Register.init();
-		this.log = new StringBuilder();
 	}
 
 	@Override
@@ -37,6 +35,12 @@ public class CodeGenerationVisitor extends IVisitor {
 	public void visit(NodeConst node) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'visit'");
+	}
+
+	@Override
+	public void visit(NodeConvert node) {
+		node.getExpr().accept(this);
+		node.setCodice(node.getExpr().getCodice() + " 5 k");
 	}
 
 	@Override
@@ -84,11 +88,5 @@ public class CodeGenerationVisitor extends IVisitor {
 	public void visit(NodePrint node) {
 		node.getId().accept(this);
 		node.setCodice("l" + node.getId().getDefinition().getRegister() + " p P");
-	}
-
-	@Override
-	public void visit(NodeConvert node) {
-		node.getExpr().accept(this);
-		node.setCodice(node.getExpr().getCodice());
 	}
 }
