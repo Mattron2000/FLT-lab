@@ -12,6 +12,16 @@ import ast.NodePrg;
 import ast.NodePrint;
 import ast.TypeDescriptor;
 
+/**
+ * @author Palmieri Matteo
+ * 
+ *         LISTA COMANDI
+ *         - sa : pop dello stack e lo mette nel registro a
+ *         - la : push sullo stack dal registro a
+ *         - p : stampa su terminale il valore in cima allo stack
+ *         - P : scarta il valore in cima allo stack facendo pop
+ *         - x k : indica che il valore in cima allo stack avrá x cifre decimali
+ */
 public class CodeGenerationVisitor extends IVisitor {
 
 	public CodeGenerationVisitor() {
