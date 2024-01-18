@@ -1,5 +1,6 @@
 package visitor;
 
+import ast.LangType;
 import ast.NodeAssign;
 import ast.NodeBinOp;
 import ast.NodeConst;
@@ -64,8 +65,12 @@ public class CodeGenerationVisitor extends IVisitor {
 
 	@Override
 	public void visit(NodeConst node) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'visit'");
+		node.accept(this);
+
+		if (node.getLangType() == LangType.FLOAT)
+			node.setCodice(node.getValue() + " 5 k");
+		else
+			node.setCodice(node.getValue() + " 0 k");
 	}
 
 	@Override
