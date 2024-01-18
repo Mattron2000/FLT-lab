@@ -15,12 +15,10 @@ import ast.TypeDescriptor;
 import symbolTable.Attributes;
 import symbolTable.SymbolTable;
 
-public class TypeCheckingVisitor implements IVisitor {
-
-	private StringBuilder log;
+public class TypeCheckingVisitor extends IVisitor {
 
 	public TypeCheckingVisitor() {
-		this.log = new StringBuilder();
+		super();
 		SymbolTable.init();
 	}
 

@@ -10,7 +10,14 @@ import ast.NodeId;
 import ast.NodePrg;
 import ast.NodePrint;
 
-public interface IVisitor {
+public abstract class IVisitor {
+	
+	protected StringBuilder log; // per l’eventuale errore nella generazione del codice
+
+	protected IVisitor() {
+		this.log = new StringBuilder(); 
+	}
+
     public abstract void visit(NodeAssign node);
     public abstract void visit(NodeBinOp node);
     public abstract void visit(NodeConst node);
