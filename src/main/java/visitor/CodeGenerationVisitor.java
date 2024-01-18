@@ -4,6 +4,7 @@ import ast.NodeAssign;
 import ast.NodeBinOp;
 import ast.NodeConst;
 import ast.NodeConvert;
+import ast.NodeDSs;
 import ast.NodeDcl;
 import ast.NodeDefer;
 import ast.NodeId;
@@ -57,9 +58,26 @@ public class CodeGenerationVisitor extends IVisitor {
 	}
 
 	@Override
-	public void visit(NodePrg node) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'visit'");
+	public void visit(NodePrg nodePrg) {
+		StringBuffer codiceDc = new StringBuffer(); // mantiene il codice della visita
+
+		if (nodePrg.getResType() != TypeDescriptor.OK) {
+			nodePrg.setCodice(nodePrg.getResType().toString());
+			return;
+		}
+
+		for (NodeDSs nodeDSs : nodePrg.getDSsList()) {
+			nodeDSs.accept(this);
+
+			if (nodeDSs.getCodice() == null) {
+				nodePrg.setCodice("ERRORE: nodeDSs con codice null");
+				return;
+			}
+
+			codiceDc.append(nodeDSs.getCodice() + " ");
+		}
+
+		nodePrg.setCodice(codiceDc.toString().trim());
 	}
 
 	@Override
