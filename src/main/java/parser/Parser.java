@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
-import ast.LangOperAss;
 import ast.LangType;
 import ast.NodeAssign;
 import ast.NodeBinOp;
@@ -21,8 +20,7 @@ import ast.NodeStm;
 import scanner.LexicalException;
 import scanner.Scanner;
 
-import token.Token;
-import token.TokenType;
+import token.*;
 
 /**
  * @author Palmieri Matteo
@@ -158,13 +156,13 @@ public class Parser {
 				// id
 				NodeId id = new NodeId(match(TokenType.ID).getValore());
 				// opAss
-				LangOperAss langOperAss = parseStmOpAss();
+				TokenType assignOperator = parseStmOpAss();
 				// Exp
 				NodeExpr expr = parseExpr();
 				// ;
 				match(TokenType.SEMICOLON);
 
-				return new NodeAssign(langOperAss, id, expr);
+				return new NodeAssign(assignOperator, id, expr);
 			case PRINT: // Stm -> print id ;
 				// print
 				match(TokenType.PRINT);
@@ -181,29 +179,29 @@ public class Parser {
 		}
 	}
 
-	private LangOperAss parseStmOpAss() throws SyntacticException, LexicalException, IOException {
+	private TokenType parseStmOpAss() throws SyntacticException, LexicalException, IOException {
 		Token tk = this.scanner.peekToken();
 		switch (tk.getTipo()) {
 			case PLUS_ASSIGN: // opAss -> +=
 				match(TokenType.PLUS_ASSIGN);
 
-				return LangOperAss.PLUS_ASSIGN;
+				return TokenType.PLUS_ASSIGN;
 			case MINUS_ASSIGN: // opAss -> -=
 				match(TokenType.MINUS_ASSIGN);
 
-				return LangOperAss.MINUS_ASSIGN;
+				return TokenType.MINUS_ASSIGN;
 			case MULT_ASSIGN: // opAss -> *=
 				match(TokenType.MULT_ASSIGN);
 
-				return LangOperAss.MULT_ASSIGN;
+				return TokenType.MULT_ASSIGN;
 			case DIVIDE_ASSIGN: // opAss -> /=
 				match(TokenType.DIVIDE_ASSIGN);
 
-				return LangOperAss.DIVIDE_ASSIGN;
+				return TokenType.DIVIDE_ASSIGN;
 			case ASSIGN: // opAss -> =
 				match(TokenType.ASSIGN);
 
-				return LangOperAss.ASSIGN;
+				return TokenType.ASSIGN;
 			default:
 				throw new SyntacticException(
 						"Token " + tk.toString() + " alla riga " + tk.getRiga()

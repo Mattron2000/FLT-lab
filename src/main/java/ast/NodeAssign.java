@@ -1,5 +1,6 @@
 package ast;
 
+import token.TokenType;
 import visitor.IVisitor;
 
 /**
@@ -9,12 +10,12 @@ public class NodeAssign extends NodeStm {
 
     private NodeId id;
     private NodeExpr expr;
-    private LangOperAss langOperAss;
+    private TokenType operator;
 
-    public NodeAssign(LangOperAss langOperAss, NodeId id, NodeExpr expr) {
+    public NodeAssign(TokenType operator, NodeId id, NodeExpr expr) {
         this.id = id;
         this.expr = expr;
-        this.langOperAss = langOperAss;
+        this.operator = operator;
     }
 
     public NodeId getId() {
@@ -25,8 +26,8 @@ public class NodeAssign extends NodeStm {
         return this.expr;
     }
 
-    public LangOperAss getLangOperAss() {
-        return this.langOperAss;
+    public TokenType getTokenType() {
+        return this.operator;
     }
 
 	public void setExpr(NodeExpr expr) {
@@ -35,7 +36,7 @@ public class NodeAssign extends NodeStm {
 
     @Override
     public String toString() {
-        return this.id.toString() + "<" + this.langOperAss + ">" + this.expr.toString();
+        return this.id.toString() + "<" + this.operator + ">" + this.expr.toString();
     }
 
 	@Override

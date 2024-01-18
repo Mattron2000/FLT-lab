@@ -8,8 +8,7 @@ import java.io.PushbackReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import token.Token;
-import token.TokenType;
+import token.*;
 
 /**
  * componente per la scansione di file di testo di input per generare token
