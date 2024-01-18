@@ -82,8 +82,9 @@ public class CodeGenerationVisitor extends IVisitor {
 
 	@Override
 	public void visit(NodePrint node) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'visit'");
+		node.getId().accept(this);
+		
+		node.setCodice("l" + node.getId().getDefinition().getRegister() + " p P");
 	}
 
 	@Override
