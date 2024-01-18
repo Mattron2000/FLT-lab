@@ -1,0 +1,3 @@
+5_corretto.txt,,            5_corretto,,            NodeId: l'ID 'a' non é definito, NodeId: l'ID 'b' non é definito
+6_corretto.txt,,            6_corretto,,			NodeId: l'ID 'a' non é definito, NodeId: l'ID 'b' non é definito
+7_corretto.txt,,            7_corretto,,            NodeId: l'ID 'a' non é definito, NodeId: l'ID 'b' non é definito, NodeId: l'ID 'temp' non é definito
