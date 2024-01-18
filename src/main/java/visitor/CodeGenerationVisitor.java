@@ -83,13 +83,12 @@ public class CodeGenerationVisitor extends IVisitor {
 	@Override
 	public void visit(NodePrint node) {
 		node.getId().accept(this);
-		
 		node.setCodice("l" + node.getId().getDefinition().getRegister() + " p P");
 	}
 
 	@Override
 	public void visit(NodeConvert node) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'visit'");
+		node.getExpr().accept(this);
+		node.setCodice(node.getExpr().getCodice());
 	}
 }
