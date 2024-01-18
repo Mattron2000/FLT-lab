@@ -11,7 +11,7 @@ import ast.NodeExpr;
 import ast.NodeId;
 import ast.NodePrg;
 import ast.NodePrint;
-import ast.TipoTD;
+import ast.TypeDescriptor;
 import symbolTable.Attributes;
 import symbolTable.SymbolTable;
 
@@ -36,7 +36,7 @@ public class TypeCheckingVisitor implements IVisitor {
 
 	private NodeExpr convert(NodeExpr node) {
 		NodeExpr expr = new NodeConvert(node);
-		expr.setResType(TipoTD.FLOAT);
+		expr.setResType(TypeDescriptor.FLOAT);
 
 		return expr;
 	}
@@ -50,19 +50,19 @@ public class TypeCheckingVisitor implements IVisitor {
 		expr.accept(this);
 
 		if (id.getResType().equals(expr.getResType())) {
-			node.setResType(TipoTD.OK);
+			node.setResType(TypeDescriptor.OK);
 			return;
 		}
 
-		if ((id.getResType() == TipoTD.FLOAT && expr.getResType() == TipoTD.INT)) {
+		if ((id.getResType() == TypeDescriptor.FLOAT && expr.getResType() == TypeDescriptor.INT)) {
 			node.setExpr(this.convert(expr));
-			node.setResType(TipoTD.OK);
+			node.setResType(TypeDescriptor.OK);
 			return;
 		}
 
-		node.setResType(TipoTD.ERROR);
+		node.setResType(TypeDescriptor.ERROR);
 
-		if (id.getResType() == TipoTD.INT && expr.getResType() == TipoTD.FLOAT)
+		if (id.getResType() == TypeDescriptor.INT && expr.getResType() == TypeDescriptor.FLOAT)
 			setLog("NodeAssign: l'ID '" + id.toString() + "' di tipo '" + id.getResType()
 					+ "' non é compatibile con l'Expr '" + expr.toString() + "'");
 	}
@@ -80,32 +80,32 @@ public class TypeCheckingVisitor implements IVisitor {
 			return;
 		}
 
-		if (exprLeft.getResType() == TipoTD.INT && exprRight.getResType() == TipoTD.FLOAT) {
+		if (exprLeft.getResType() == TypeDescriptor.INT && exprRight.getResType() == TypeDescriptor.FLOAT) {
 			node.setLeft(this.convert(exprLeft));
-			node.setResType(TipoTD.FLOAT);
+			node.setResType(TypeDescriptor.FLOAT);
 			return;
 		}
 
-		if (exprLeft.getResType() == TipoTD.FLOAT && exprRight.getResType() == TipoTD.INT) {
+		if (exprLeft.getResType() == TypeDescriptor.FLOAT && exprRight.getResType() == TypeDescriptor.INT) {
 			node.setRight(this.convert(exprRight));
-			node.setResType(TipoTD.FLOAT);
+			node.setResType(TypeDescriptor.FLOAT);
 			return;
 		}
 
-		node.setResType(TipoTD.ERROR);
+		node.setResType(TypeDescriptor.ERROR);
 	}
 
 	@Override
 	public void visit(NodeConst node) {
 		switch (node.getLangType()) {
 			case INT:
-				node.setResType(TipoTD.INT);
+				node.setResType(TypeDescriptor.INT);
 				break;
 			case FLOAT:
-				node.setResType(TipoTD.FLOAT);
+				node.setResType(TypeDescriptor.FLOAT);
 				break;
 			default:
-				node.setResType(TipoTD.ERROR);
+				node.setResType(TypeDescriptor.ERROR);
 		}
 	}
 
@@ -121,8 +121,8 @@ public class TypeCheckingVisitor implements IVisitor {
 		// cerca il NodeId nella Symbol Table
 		// se lo trovi assegna a resType ERRORE e aggiungi al log l’indicazione che
 		// l’identificatore e’ gia’ definito
-		if (id.getResType() == TipoTD.INT || id.getResType() == TipoTD.FLOAT) {
-			node.setResType(TipoTD.ERROR);
+		if (id.getResType() == TypeDescriptor.INT || id.getResType() == TypeDescriptor.FLOAT) {
+			node.setResType(TypeDescriptor.ERROR);
 			setLog("NodeDcl: l'ID '" + id.getValue() + "' é giá definito");
 			return;
 		}
@@ -133,24 +133,24 @@ public class TypeCheckingVisitor implements IVisitor {
 
 		switch (attr.getType()) {
 			case FLOAT:
-				id.setResType(TipoTD.FLOAT);
+				id.setResType(TypeDescriptor.FLOAT);
 				break;
 			case INT:
-				id.setResType(TipoTD.INT);
+				id.setResType(TypeDescriptor.INT);
 		}
 
 		SymbolTable.enter(id.getValue(), attr);
-		node.setResType(TipoTD.OK);
+		node.setResType(TypeDescriptor.OK);
 
-		if (expr == null || (id.getResType() == expr.getResType() && id.getResType() != TipoTD.ERROR))
+		if (expr == null || (id.getResType() == expr.getResType() && id.getResType() != TypeDescriptor.ERROR))
 			return;
 
-		if (id.getResType() == TipoTD.FLOAT && expr.getResType() == TipoTD.INT) {
+		if (id.getResType() == TypeDescriptor.FLOAT && expr.getResType() == TypeDescriptor.INT) {
 			node.setExpr(this.convert(expr));
 			return;
 		}
 
-		node.setResType(TipoTD.ERROR);
+		node.setResType(TypeDescriptor.ERROR);
 
 		setLog("NodeDcl: l'ID '" + id.toString() + "' di tipo '" + id.getResType()
 				+ "' non é compatibile con l'Expr '" + expr.toString() + "'");
@@ -164,7 +164,7 @@ public class TypeCheckingVisitor implements IVisitor {
 
 		node.setResType(id.getResType());
 
-		if (node.getResType() == TipoTD.ERROR)
+		if (node.getResType() == TypeDescriptor.ERROR)
 			setLog("NodeDefer: l'ID '" + id.getValue() + "' non é definito");
 	}
 
@@ -173,17 +173,17 @@ public class TypeCheckingVisitor implements IVisitor {
 		// cerca il NodeId nella Symbol Table se non lo trovi assegna a resType ERROR e
 		// aggiungi al log l’indicazione che l’identificatore non e’ definito
 		if (SymbolTable.lookup(node.getValue()) == null) {
-			node.setResType(TipoTD.ERROR);
+			node.setResType(TypeDescriptor.ERROR);
 			setLog("NodeId: l'ID '" + node.getValue() + "' non é definito");
 		} else { // altrimenti setta resType al tipo dell’identificatore e il campo definition
 					// alla entry della symbol table.
 			node.setDefinition(SymbolTable.lookup(node.getValue()));
 			switch (SymbolTable.lookup(node.getValue()).getType()) {
 				case INT:
-					node.setResType(TipoTD.INT);
+					node.setResType(TypeDescriptor.INT);
 					break;
 				case FLOAT:
-					node.setResType(TipoTD.FLOAT);
+					node.setResType(TypeDescriptor.FLOAT);
 					break;
 			}
 		}
@@ -191,13 +191,13 @@ public class TypeCheckingVisitor implements IVisitor {
 
 	@Override
 	public void visit(NodePrg node) {
-		node.setResType(TipoTD.OK);
+		node.setResType(TypeDescriptor.OK);
 
 		for (NodeDSs nodeDSs : node.getDSsList()) {
 			nodeDSs.accept(this);
 
-			if (nodeDSs.getResType() == TipoTD.ERROR)
-				node.setResType(TipoTD.ERROR);
+			if (nodeDSs.getResType() == TypeDescriptor.ERROR)
+				node.setResType(TypeDescriptor.ERROR);
 		}
 	}
 
@@ -207,11 +207,11 @@ public class TypeCheckingVisitor implements IVisitor {
 
 		id.accept(this);
 
-		if (id.getResType() == TipoTD.ERROR) {
-			node.setResType(TipoTD.ERROR);
+		if (id.getResType() == TypeDescriptor.ERROR) {
+			node.setResType(TypeDescriptor.ERROR);
 			setLog("PRINT: l'ID '" + id.getValue() + "' non é definito");
 		} else
-			node.setResType(TipoTD.OK);
+			node.setResType(TypeDescriptor.OK);
 	}
 
 	@Override
@@ -220,9 +220,9 @@ public class TypeCheckingVisitor implements IVisitor {
 
 		expr.accept(this);
 
-		if (expr.getResType() == TipoTD.ERROR)
-			node.setResType(TipoTD.ERROR);
+		if (expr.getResType() == TypeDescriptor.ERROR)
+			node.setResType(TypeDescriptor.ERROR);
 		else
-			node.setResType(TipoTD.FLOAT);
+			node.setResType(TypeDescriptor.FLOAT);
 	}
 }

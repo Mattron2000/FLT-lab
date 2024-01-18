@@ -10,7 +10,7 @@ import ast.NodeId;
 import ast.NodePrg;
 import ast.NodePrint;
 
-public abstract interface IVisitor {
+public interface IVisitor {
     public abstract void visit(NodeAssign node);
     public abstract void visit(NodeBinOp node);
     public abstract void visit(NodeConst node);

@@ -1,6 +1,6 @@
 package ast;
 
-public enum TipoTD {
+public enum TypeDescriptor {
 	INT,
 	FLOAT,
 	OK,

@@ -7,14 +7,23 @@ import visitor.IVisitor;
  */
 public abstract class NodeAST {
 
-	private TipoTD resType;
+	private TypeDescriptor type;
+	public String code;
 
-	public TipoTD getResType() {
-		return this.resType;
+	public TypeDescriptor getResType() {
+		return this.type;
 	}
 
-	public void setResType(TipoTD resType) {
-		this.resType = resType;
+	public void setResType(TypeDescriptor type) {
+		this.type = type;
+	}
+
+	public String getCodice() {
+		return this.code;
+	}
+
+	public void setCodice(String codice) {
+		this.code = codice;
 	}
 
 	public abstract void accept(IVisitor visitor);
