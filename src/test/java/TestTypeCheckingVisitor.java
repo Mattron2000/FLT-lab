@@ -21,8 +21,8 @@ import symbolTable.SymbolTable;
 
 import visitor.TypeCheckingVisitor;
 
-class TestVisitor {
-	private final String RootFolderOfJavaProject = System.getProperty("user.dir") + "/src/test/java/data/testVisitor/";
+class TestTypeCheckingVisitor {
+	private final String RootFolderOfJavaProject = System.getProperty("user.dir") + "/src/test/java/data/testTypeCheckingVisitor/";
 
 	@TestFactory
 	public Stream<DynamicTest> generateDynamicTests() {

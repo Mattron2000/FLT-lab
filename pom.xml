@@ -13,6 +13,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+	
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -21,28 +22,4 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.3.1</version> <!-- Aggiorna la versione del plugin se necessario -->
-                <configuration>
-                    <source>21</source> <!-- Specifica la versione del codice sorgente (se necessario) -->
-                    <encoding>UTF-8</encoding> <!-- Specifica l'encoding se diverso da quello predefinito -->
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>javadoc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>
