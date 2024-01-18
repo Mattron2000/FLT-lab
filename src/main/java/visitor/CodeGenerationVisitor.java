@@ -11,6 +11,7 @@ import ast.NodeId;
 import ast.NodePrg;
 import ast.NodePrint;
 import ast.TypeDescriptor;
+import token.TokenType;
 
 /**
  * @author Palmieri Matteo
@@ -29,6 +30,21 @@ public class CodeGenerationVisitor extends IVisitor {
 		Register.init();
 	}
 
+	private String getCodiceDcBinOp(TokenType op) {
+		switch (op) {
+			case PLUS:
+				return "+";
+			case MINUS:
+				return "-";
+			case MULT:
+				return "*";
+			case DIVIDE:
+				return "/";
+			default:
+				return "ERRORE OPERATORE";
+		}
+	}
+
 	@Override
 	public void visit(NodeAssign node) {
 		node.getId().accept(this);
@@ -39,8 +55,11 @@ public class CodeGenerationVisitor extends IVisitor {
 
 	@Override
 	public void visit(NodeBinOp node) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'visit'");
+		node.getLeft().accept(this);
+		node.getRight().accept(this);
+
+		node.setCodice(node.getLeft().getCodice() + " " + node.getRight().getCodice()
+				+ getCodiceDcBinOp(node.getOp()));
 	}
 
 	@Override
