@@ -22,16 +22,6 @@ public class TypeCheckingVisitor extends IVisitor {
 		SymbolTable.init();
 	}
 
-	public String getLog() {
-		return this.log.toString();
-	}
-
-	private void setLog(String string) {
-		if (!this.log.toString().equals(""))
-			this.log.append(", ");
-		this.log.append(string);
-	}
-
 	private NodeExpr convert(NodeExpr node) {
 		NodeExpr expr = new NodeConvert(node);
 		expr.setResType(TypeDescriptor.FLOAT);

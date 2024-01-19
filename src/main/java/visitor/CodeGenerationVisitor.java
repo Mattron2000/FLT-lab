@@ -1,6 +1,5 @@
 package visitor;
 
-import ast.LangType;
 import ast.NodeAssign;
 import ast.NodeBinOp;
 import ast.NodeConst;
@@ -11,7 +10,9 @@ import ast.NodeDefer;
 import ast.NodeId;
 import ast.NodePrg;
 import ast.NodePrint;
-import ast.TypeDescriptor;
+
+import symbolTable.SymbolTable;
+
 import token.TokenType;
 
 /**
@@ -28,6 +29,7 @@ public class CodeGenerationVisitor extends IVisitor {
 
 	public CodeGenerationVisitor() {
 		super();
+		SymbolTable.init();
 		Register.init();
 	}
 
@@ -59,18 +61,14 @@ public class CodeGenerationVisitor extends IVisitor {
 		node.getLeft().accept(this);
 		node.getRight().accept(this);
 
-		node.setCodice(node.getLeft().getCodice() + " " + node.getRight().getCodice()
-				+ getCodiceDcBinOp(node.getOp()));
+		node.setCodice(node.getLeft().getCodice() +
+				" " + node.getRight().getCodice() +
+				" " + getCodiceDcBinOp(node.getOp()));
 	}
 
 	@Override
 	public void visit(NodeConst node) {
-		node.accept(this);
-
-		if (node.getLangType() == LangType.FLOAT)
-			node.setCodice(node.getValue() + " 5 k");
-		else
-			node.setCodice(node.getValue() + " 0 k");
+		node.setCodice(node.getValue());
 	}
 
 	@Override
@@ -81,54 +79,57 @@ public class CodeGenerationVisitor extends IVisitor {
 
 	@Override
 	public void visit(NodeDcl node) {
-		node.getId().getDefinition().setRegister(Register.newRegister());
+		node.getId().getDefinition().setType(node.getType());
+		node.getId().accept(this);
 
-        if (node.getExpr() != null) {
-            node.getId().accept(this);
-            node.getExpr().accept(this);
+		if (node.getExpr() == null) {
+			node.setCodice("");
+			return;
+		}
 
-            node.setCodice(node.getExpr().getCodice() + " s" + node.getId().getCodice());
-        }
+		node.getExpr().accept(this);
+
+		switch (node.getId().getDefinition().getType()) {
+			case FLOAT:
+				node.setCodice(node.getExpr().getCodice() + " 5 k s" + node.getId().getCodice() + " 0 k");
+				break;
+			case INT:
+				node.setCodice(node.getExpr().getCodice() + " s" + node.getId().getCodice() + " 0 k");
+				break;
+		}
 	}
 
 	@Override
 	public void visit(NodeDefer node) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'visit'");
+		node.getId().accept(this);
+		node.setCodice("l" + node.getId().getCodice());
 	}
 
 	@Override
 	public void visit(NodeId node) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'visit'");
+		if (SymbolTable.lookup(node.getValue()) == null) {
+			node.getDefinition().setRegister(Register.newRegister());
+
+			SymbolTable.enter(node.getValue(), node.getDefinition());
+		} else
+			node.setDefinition(SymbolTable.lookup(node.getValue()));
+
+		node.setCodice(node.getDefinition().getRegister().toString());
 	}
 
 	@Override
 	public void visit(NodePrg nodePrg) {
-		StringBuffer codiceDc = new StringBuffer(); // mantiene il codice della visita
-
-		if (nodePrg.getResType() != TypeDescriptor.OK) {
-			nodePrg.setCodice(nodePrg.getResType().toString());
-			return;
-		}
-
 		for (NodeDSs nodeDSs : nodePrg.getDSsList()) {
 			nodeDSs.accept(this);
-
-			if (nodeDSs.getCodice() == null) {
-				nodePrg.setCodice("ERRORE: nodeDSs con codice null");
-				return;
-			}
-
-			codiceDc.append(nodeDSs.getCodice() + " ");
+			if (!nodeDSs.getCodice().equals(""))
+				setLog(nodeDSs.getCodice());
 		}
-
-		nodePrg.setCodice(codiceDc.toString().trim());
+		nodePrg.setCodice(this.log.toString());
 	}
 
 	@Override
 	public void visit(NodePrint node) {
 		node.getId().accept(this);
-		node.setCodice("l" + node.getId().getDefinition().getRegister() + " p P");
+		node.setCodice("l" + node.getId().getCodice() + " p P 0 k");
 	}
 }

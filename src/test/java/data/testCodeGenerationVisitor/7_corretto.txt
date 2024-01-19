@@ -4,6 +4,6 @@ float temp;
 
 temp = a+b/7; 
 
-a -= b;
+a = b;
 
 print temp;

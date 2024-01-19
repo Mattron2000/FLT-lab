@@ -15,6 +15,11 @@ public class Attributes {
 		this.register = null;
 	}
 
+	public Attributes() {
+		this.type = null;
+		this.register = null;
+	}
+
 	public LangType getType() {
 		return this.type;
 	}

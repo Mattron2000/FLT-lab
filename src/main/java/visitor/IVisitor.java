@@ -18,6 +18,16 @@ public abstract class IVisitor {
 		this.log = new StringBuilder(); 
 	}
 
+	public String getLog() {
+		return this.log.toString();
+	}
+
+	protected void setLog(String string) {
+		if (!this.log.toString().equals(""))
+			this.log.append(", ");
+		this.log.append(string);
+	}
+
     public abstract void visit(NodeAssign node);
     public abstract void visit(NodeBinOp node);
     public abstract void visit(NodeConst node);

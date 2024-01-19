@@ -14,7 +14,7 @@ public class NodeId extends NodeAST {
 
     public NodeId(String value) {
         this.value = value;
-		this.definition = null;
+		this.definition = new Attributes(null);
     }
 
 	public NodeId(String value, Attributes definition) {
