@@ -10,7 +10,7 @@ import ast.NodeDefer;
 import ast.NodeId;
 import ast.NodePrg;
 import ast.NodePrint;
-
+import ast.TypeDescriptor;
 import symbolTable.SymbolTable;
 
 import token.TokenType;
@@ -53,7 +53,14 @@ public class CodeGenerationVisitor extends IVisitor {
 		node.getId().accept(this);
 		node.getExpr().accept(this);
 
-		node.setCodice(node.getExpr().getCodice() + " s" + node.getId().getCodice() + " 0 k");
+		if (node.getId().getResType().equals(node.getExpr().getResType())) {
+			node.setCodice(node.getExpr().getCodice() + " s" + node.getId().getCodice() + " 0 k");
+		} else {
+			if (node.getId().getResType().equals(TypeDescriptor.FLOAT))
+				node.setCodice(node.getExpr().getCodice() + " 5 k s" + node.getId().getCodice() + " 0 k");
+			else
+				node.setCodice(node.getExpr().getCodice() + " 0 k s" + node.getId().getCodice() + " 0 k");
+		}
 	}
 
 	@Override
@@ -61,20 +68,51 @@ public class CodeGenerationVisitor extends IVisitor {
 		node.getLeft().accept(this);
 		node.getRight().accept(this);
 
-		node.setCodice(node.getLeft().getCodice() +
-				" " + node.getRight().getCodice() +
-				" " + getCodiceDcBinOp(node.getOp()));
+		switch (node.getOp()) {
+			case DIVIDE:
+				node.setResType(TypeDescriptor.FLOAT);
+				node.setCodice(node.getLeft().getCodice() +
+						" " + node.getRight().getCodice() +
+						" 5 k " + getCodiceDcBinOp(node.getOp()));
+				break;
+			case MULT:
+			case MINUS:
+			case PLUS:
+				if (node.getLeft().getResType().equals(TypeDescriptor.FLOAT) ||
+						node.getRight().getResType().equals(TypeDescriptor.FLOAT)) {
+					node.setResType(TypeDescriptor.FLOAT);
+
+					node.setCodice(node.getLeft().getCodice() +
+							" " + node.getRight().getCodice() +
+							" 5 k " + getCodiceDcBinOp(node.getOp()));
+				} else {
+					node.setResType(TypeDescriptor.INT);
+
+					node.setCodice(node.getLeft().getCodice() +
+							" " + node.getRight().getCodice() +
+							" " + getCodiceDcBinOp(node.getOp()));
+				}
+				break;
+			default:
+				break;
+		}
 	}
 
 	@Override
 	public void visit(NodeConst node) {
+		if (node.getValue().contains("."))
+			node.setResType(TypeDescriptor.FLOAT);
+		else
+			node.setResType(TypeDescriptor.INT);
 		node.setCodice(node.getValue());
 	}
 
 	@Override
 	public void visit(NodeConvert node) {
 		node.getExpr().accept(this);
-		node.setCodice(node.getExpr().getCodice() + " 5 k");
+
+		node.setResType(TypeDescriptor.FLOAT);
+		node.setCodice(node.getExpr().getCodice() + ".0");
 	}
 
 	@Override
@@ -94,7 +132,7 @@ public class CodeGenerationVisitor extends IVisitor {
 				node.setCodice(node.getExpr().getCodice() + " 5 k s" + node.getId().getCodice() + " 0 k");
 				break;
 			case INT:
-				node.setCodice(node.getExpr().getCodice() + " s" + node.getId().getCodice() + " 0 k");
+				node.setCodice(node.getExpr().getCodice() + " s" + node.getId().getCodice());
 				break;
 		}
 	}
@@ -102,6 +140,15 @@ public class CodeGenerationVisitor extends IVisitor {
 	@Override
 	public void visit(NodeDefer node) {
 		node.getId().accept(this);
+
+		switch (node.getId().getDefinition().getType()) {
+			case FLOAT:
+				node.setResType(TypeDescriptor.FLOAT);
+				break;
+			case INT:
+				node.setResType(TypeDescriptor.INT);
+				break;
+		}
 		node.setCodice("l" + node.getId().getCodice());
 	}
 
@@ -114,6 +161,16 @@ public class CodeGenerationVisitor extends IVisitor {
 		} else
 			node.setDefinition(SymbolTable.lookup(node.getValue()));
 
+		switch (node.getDefinition().getType()) {
+			case FLOAT:
+				node.setResType(TypeDescriptor.FLOAT);
+				break;
+			case INT:
+				node.setResType(TypeDescriptor.INT);
+				break;
+			default:
+				break;
+		}
 		node.setCodice(node.getDefinition().getRegister().toString());
 	}
 
@@ -130,6 +187,6 @@ public class CodeGenerationVisitor extends IVisitor {
 	@Override
 	public void visit(NodePrint node) {
 		node.getId().accept(this);
-		node.setCodice("l" + node.getId().getCodice() + " p P 0 k");
+		node.setCodice("l" + node.getId().getCodice() + " p P");
 	}
 }

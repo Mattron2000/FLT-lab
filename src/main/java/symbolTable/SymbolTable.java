@@ -49,10 +49,13 @@ public class SymbolTable {
 	 * @return
 	 */
 	public static String toStr() {
-		StringBuilder res = new StringBuilder("symbol table\n=============\n");
+		StringBuilder res = new StringBuilder(
+				"-----------------symbol table----------------\n" +
+				"nome variabile\t| nome registro\t| tipo valore\n");
 
 		for (HashMap.Entry<String, Attributes> entry : table.entrySet())
-			res.append(entry.getKey() + "   \t" + entry.getValue() + "\n");
+			res.append("  " + entry.getKey() + "\t\t| " + entry.getValue().getRegister() + "\t\t| " + entry.getValue().getType()
+					+ "\n");
 
 		return res.toString();
 	}
