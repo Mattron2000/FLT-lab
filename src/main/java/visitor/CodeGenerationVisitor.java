@@ -68,33 +68,19 @@ public class CodeGenerationVisitor extends IVisitor {
 		node.getLeft().accept(this);
 		node.getRight().accept(this);
 
-		switch (node.getOp()) {
-			case DIVIDE:
-				node.setResType(TypeDescriptor.FLOAT);
-				node.setCodice(node.getLeft().getCodice() +
-						" " + node.getRight().getCodice() +
-						" 5 k " + getCodiceDcBinOp(node.getOp()));
-				break;
-			case MULT:
-			case MINUS:
-			case PLUS:
-				if (node.getLeft().getResType().equals(TypeDescriptor.FLOAT) ||
-						node.getRight().getResType().equals(TypeDescriptor.FLOAT)) {
-					node.setResType(TypeDescriptor.FLOAT);
+		if (node.getLeft().getResType().equals(TypeDescriptor.FLOAT) ||
+				node.getRight().getResType().equals(TypeDescriptor.FLOAT)) {
+			node.setResType(TypeDescriptor.FLOAT);
 
-					node.setCodice(node.getLeft().getCodice() +
-							" " + node.getRight().getCodice() +
-							" 5 k " + getCodiceDcBinOp(node.getOp()));
-				} else {
-					node.setResType(TypeDescriptor.INT);
+			node.setCodice(node.getLeft().getCodice() +
+					" " + node.getRight().getCodice() +
+					" 5 k " + getCodiceDcBinOp(node.getOp()));
+		} else {
+			node.setResType(TypeDescriptor.INT);
 
-					node.setCodice(node.getLeft().getCodice() +
-							" " + node.getRight().getCodice() +
-							" " + getCodiceDcBinOp(node.getOp()));
-				}
-				break;
-			default:
-				break;
+			node.setCodice(node.getLeft().getCodice() +
+					" " + node.getRight().getCodice() +
+					" " + getCodiceDcBinOp(node.getOp()));
 		}
 	}
 
