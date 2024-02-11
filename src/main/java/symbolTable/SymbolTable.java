@@ -19,7 +19,7 @@ public class SymbolTable {
 
 	/**
 	 * Inserisci una nuova coppia <String, Attributes>, se viene aggiunta con
-	 * successo, ritorna true, se esiste giá la kay, ritorna false
+	 * successo, ritorna true, se esiste giá la key, ritorna false
 	 * 
 	 * @param id    chiave, solitamente il nome dell'ID
 	 * @param entry valore, il relativo Attributes
@@ -51,11 +51,11 @@ public class SymbolTable {
 	public static String toStr() {
 		StringBuilder res = new StringBuilder(
 				"-----------------symbol table----------------\n" +
-				"nome variabile\t| nome registro\t| tipo valore\n");
+						"nome variabile\t| nome registro\t| tipo valore\n");
 
 		for (HashMap.Entry<String, Attributes> entry : table.entrySet())
-			res.append("  " + entry.getKey() + "\t\t| " + entry.getValue().getRegister() + "\t\t| " + entry.getValue().getType()
-					+ "\n");
+			res.append("  " + entry.getKey() + "\t\t| " + entry.getValue().getRegister() + "\t\t| "
+					+ entry.getValue().getType() + "\n");
 
 		return res.toString();
 	}

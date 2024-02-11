@@ -53,14 +53,10 @@ public class CodeGenerationVisitor extends IVisitor {
 		node.getId().accept(this);
 		node.getExpr().accept(this);
 
-		if (node.getId().getResType().equals(node.getExpr().getResType())) {
-			node.setCodice(node.getExpr().getCodice() + " s" + node.getId().getCodice() + " 0 k");
-		} else {
-			if (node.getId().getResType().equals(TypeDescriptor.FLOAT))
-				node.setCodice(node.getExpr().getCodice() + " 5 k s" + node.getId().getCodice() + " 0 k");
-			else
-				node.setCodice(node.getExpr().getCodice() + " 0 k s" + node.getId().getCodice() + " 0 k");
-		}
+		node.setCodice(node.getExpr().getCodice() + " s" + node.getId().getCodice());
+
+		if (node.getExpr().getCodice().contains("5 k"))
+			node.setCodice(node.getCodice() + " 0 k");
 	}
 
 	@Override
@@ -68,20 +64,20 @@ public class CodeGenerationVisitor extends IVisitor {
 		node.getLeft().accept(this);
 		node.getRight().accept(this);
 
-		if (node.getLeft().getResType().equals(TypeDescriptor.FLOAT) ||
-				node.getRight().getResType().equals(TypeDescriptor.FLOAT)) {
+		if (node.getLeft().getResType().equals(TypeDescriptor.FLOAT)
+				|| node.getRight().getResType().equals(TypeDescriptor.FLOAT))
 			node.setResType(TypeDescriptor.FLOAT);
+		else
+			node.setResType(TypeDescriptor.INT);
 
+		if (node.getResType().equals(TypeDescriptor.FLOAT) && node.getOp().equals(TokenType.DIVIDE))
 			node.setCodice(node.getLeft().getCodice() +
 					" " + node.getRight().getCodice() +
 					" 5 k " + getCodiceDcBinOp(node.getOp()));
-		} else {
-			node.setResType(TypeDescriptor.INT);
-
+		else
 			node.setCodice(node.getLeft().getCodice() +
 					" " + node.getRight().getCodice() +
 					" " + getCodiceDcBinOp(node.getOp()));
-		}
 	}
 
 	@Override
@@ -98,11 +94,13 @@ public class CodeGenerationVisitor extends IVisitor {
 		node.getExpr().accept(this);
 
 		node.setResType(TypeDescriptor.FLOAT);
-		node.setCodice(node.getExpr().getCodice() + ".0");
+		node.setCodice(node.getExpr().getCodice());
 	}
 
 	@Override
 	public void visit(NodeDcl node) {
+		// set NodeId type to FLOAT or INT in base of keyword used FLOAT_KW or INT_KW,
+		// else throw error
 		node.getId().getDefinition().setType(node.getType());
 		node.getId().accept(this);
 
@@ -113,14 +111,10 @@ public class CodeGenerationVisitor extends IVisitor {
 
 		node.getExpr().accept(this);
 
-		switch (node.getId().getDefinition().getType()) {
-			case FLOAT:
-				node.setCodice(node.getExpr().getCodice() + " 5 k s" + node.getId().getCodice() + " 0 k");
-				break;
-			case INT:
-				node.setCodice(node.getExpr().getCodice() + " s" + node.getId().getCodice());
-				break;
-		}
+		node.setCodice(node.getExpr().getCodice() + " s" + node.getId().getCodice());
+
+		if (node.getExpr().getCodice().contains("5 k"))
+			node.setCodice(node.getCodice() + " 0 k");
 	}
 
 	@Override
