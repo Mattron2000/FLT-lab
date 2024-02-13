@@ -12,8 +12,8 @@ import ast.NodeId;
 import ast.NodePrg;
 import ast.NodePrint;
 import ast.TypeDescriptor;
-import symbolTable.Attributes;
-import symbolTable.SymbolTable;
+
+import symbolTable.*;
 
 public class TypeCheckingVisitor extends IVisitor {
 
