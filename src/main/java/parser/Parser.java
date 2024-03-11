@@ -152,17 +152,17 @@ public class Parser {
 	private NodeStm parseStm() throws SyntacticException, LexicalException, IOException {
 		Token tk = this.scanner.peekToken();
 		switch (tk.getTipo()) {
-			case ID: // Stm -> id opAss Exp ;
+			case ID: // Stm -> id = Exp ;
 				// id
 				NodeId id = new NodeId(match(TokenType.ID).getValore());
-				// opAss
-				TokenType assignOperator = parseStmOpAss();
+				// =
+				match(TokenType.ASSIGN);
 				// Exp
 				NodeExpr expr = parseExpr();
 				// ;
 				match(TokenType.SEMICOLON);
 
-				return new NodeAssign(assignOperator, id, expr);
+				return new NodeAssign(TokenType.ASSIGN, id, expr);
 			case PRINT: // Stm -> print id ;
 				// print
 				match(TokenType.PRINT);
@@ -179,35 +179,35 @@ public class Parser {
 		}
 	}
 
-	private TokenType parseStmOpAss() throws SyntacticException, LexicalException, IOException {
-		Token tk = this.scanner.peekToken();
-		switch (tk.getTipo()) {
-			case PLUS_ASSIGN: // opAss -> +=
-				match(TokenType.PLUS_ASSIGN);
+	// private TokenType parseStmOpAss() throws SyntacticException, LexicalException, IOException {
+	// 	Token tk = this.scanner.peekToken();
+	// 	switch (tk.getTipo()) {
+	// 		case PLUS_ASSIGN: // opAss -> +=
+	// 			match(TokenType.PLUS_ASSIGN);
 
-				return TokenType.PLUS_ASSIGN;
-			case MINUS_ASSIGN: // opAss -> -=
-				match(TokenType.MINUS_ASSIGN);
+	// 			return TokenType.PLUS_ASSIGN;
+	// 		case MINUS_ASSIGN: // opAss -> -=
+	// 			match(TokenType.MINUS_ASSIGN);
 
-				return TokenType.MINUS_ASSIGN;
-			case MULT_ASSIGN: // opAss -> *=
-				match(TokenType.MULT_ASSIGN);
+	// 			return TokenType.MINUS_ASSIGN;
+	// 		case MULT_ASSIGN: // opAss -> *=
+	// 			match(TokenType.MULT_ASSIGN);
 
-				return TokenType.MULT_ASSIGN;
-			case DIVIDE_ASSIGN: // opAss -> /=
-				match(TokenType.DIVIDE_ASSIGN);
+	// 			return TokenType.MULT_ASSIGN;
+	// 		case DIVIDE_ASSIGN: // opAss -> /=
+	// 			match(TokenType.DIVIDE_ASSIGN);
 
-				return TokenType.DIVIDE_ASSIGN;
-			case ASSIGN: // opAss -> =
-				match(TokenType.ASSIGN);
+	// 			return TokenType.DIVIDE_ASSIGN;
+	// 		case ASSIGN: // opAss -> =
+	// 			match(TokenType.ASSIGN);
 
-				return TokenType.ASSIGN;
-			default:
-				throw new SyntacticException(
-						"Token " + tk.toString() + " alla riga " + tk.getRiga()
-								+ " non é quello giusto per scrivere uno statement");
-		}
-	}
+	// 			return TokenType.ASSIGN;
+	// 		default:
+	// 			throw new SyntacticException(
+	// 					"Token " + tk.toString() + " alla riga " + tk.getRiga()
+	// 							+ " non é quello giusto per scrivere uno statement");
+	// 	}
+	// }
 
 	private NodeExpr parseExpr() throws SyntacticException, LexicalException, IOException {
 		Token tk = this.scanner.peekToken();

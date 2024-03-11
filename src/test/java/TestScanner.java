@@ -107,7 +107,7 @@ class TestScanner {
 		assertEquals(t.getValore(), "temp");
 
 		t = s.nextToken();
-		assertEquals(t.getTipo(), TokenType.PLUS_ASSIGN);
+		assertEquals(t.getTipo(), TokenType.ASSIGN);
 		assertEquals(t.getRiga(), 2);
 		assertEquals(t.getValore(), null);
 
@@ -334,7 +334,7 @@ class TestScanner {
 
 		t = s.nextToken();
 		assertEquals(t.getRiga(), 1);
-		assertEquals(t.getTipo(), TokenType.DIVIDE_ASSIGN);
+		assertEquals(t.getTipo(), TokenType.ASSIGN);
 		assertEquals(t.getValore(), null);
 
 		t = s.nextToken();
@@ -354,7 +354,7 @@ class TestScanner {
 
 		t = s.nextToken();
 		assertEquals(t.getRiga(), 5);
-		assertEquals(t.getTipo(), TokenType.PLUS_ASSIGN);
+		assertEquals(t.getTipo(), TokenType.ASSIGN);
 		assertEquals(t.getValore(), null);
 
 		t = s.nextToken();
@@ -364,7 +364,7 @@ class TestScanner {
 
 		t = s.nextToken();
 		assertEquals(t.getRiga(), 6);
-		assertEquals(t.getTipo(), TokenType.MINUS_ASSIGN);
+		assertEquals(t.getTipo(), TokenType.ASSIGN);
 		assertEquals(t.getValore(), null);
 
 		t = s.nextToken();
@@ -379,7 +379,7 @@ class TestScanner {
 
 		t = s.nextToken();
 		assertEquals(t.getRiga(), 8);
-		assertEquals(t.getTipo(), TokenType.MULT_ASSIGN);
+		assertEquals(t.getTipo(), TokenType.ASSIGN);
 		assertEquals(t.getValore(), null);
 
 		t = s.nextToken();

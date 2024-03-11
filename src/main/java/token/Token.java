@@ -36,14 +36,12 @@ public class Token {
 	@Override
 	public String toString() {
 		if (valore != null)
-			return "<" +
-					tipo +
+			return "<" + tipo +
 					", riga:" + riga +
 					", valore:" + valore +
 					'>';
 		else
-			return "<" +
-					tipo +
+			return "<" + tipo +
 					", riga:" + riga +
 					'>';
 	}

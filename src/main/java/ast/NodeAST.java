@@ -1,6 +1,7 @@
 package ast;
 
 import visitor.IVisitor;
+import visitor.TypeDescriptor;
 
 /**
  * @author Palmieri Matteo

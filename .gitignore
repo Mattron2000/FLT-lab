@@ -21,3 +21,4 @@ buildNumber.properties
 
 !**/src/main/**/target/
 !**/src/test/**/target/
+src.zip

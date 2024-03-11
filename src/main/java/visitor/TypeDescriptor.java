@@ -1,4 +1,4 @@
-package ast;
+package visitor;
 
 public enum TypeDescriptor {
 	INT,

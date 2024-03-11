@@ -10,7 +10,6 @@ import ast.NodeDefer;
 import ast.NodeId;
 import ast.NodePrg;
 import ast.NodePrint;
-import ast.TypeDescriptor;
 import symbolTable.SymbolTable;
 
 import token.TokenType;

@@ -14,10 +14,6 @@ public enum TokenType {
     MULT,
     DIVIDE,
     ASSIGN,
-    PLUS_ASSIGN,
-    MINUS_ASSIGN,
-    MULT_ASSIGN,
-    DIVIDE_ASSIGN,
     SEMICOLON,
     EOF,
     ID

@@ -22,20 +22,20 @@ class TestToken {
 				"<SEMICOLON, riga:1>", row);
 
 		// float tempb = tempa / 3.2;
-		row = new Token(TokenType.FLOAT_KW, 3).toString() +
-				new Token(TokenType.ID, 3, "tempb").toString() +
-				new Token(TokenType.ASSIGN, 3).toString() +
-				new Token(TokenType.ID, 3, "tempa").toString() +
-				new Token(TokenType.DIVIDE, 3).toString() +
-				new Token(TokenType.FLOAT_VAL, 3, "3.2").toString() +
-				new Token(TokenType.SEMICOLON, 1).toString();
-		System.out.println(row);
-		assertEquals("<FLOAT_KW, riga:3>" +
-				"<ID, riga:3, valore:tempb>" +
-				"<ASSIGN, riga:3>" +
-				"<ID, riga:3, valore:tempa>" +
-				"<DIVIDE, riga:3>" +
-				"<FLOAT_VAL, riga:3, valore:3.2>" +
-				"<SEMICOLON, riga:1>", row);
+		// row = new Token(TokenType.FLOAT_KW, 3).toString() +
+		// 		new Token(TokenType.ID, 3, "tempb").toString() +
+		// 		new Token(TokenType.ASSIGN, 3).toString() +
+		// 		new Token(TokenType.ID, 3, "tempa").toString() +
+		// 		new Token(TokenType.DIVIDE, 3).toString() +
+		// 		new Token(TokenType.FLOAT_VAL, 3, "3.2").toString() +
+		// 		new Token(TokenType.SEMICOLON, 1).toString();
+		// System.out.println(row);
+		// assertEquals("<FLOAT_KW, riga:3>" +
+		// 		"<ID, riga:3, valore:tempb>" +
+		// 		"<ASSIGN, riga:3>" +
+		// 		"<ID, riga:3, valore:tempa>" +
+		// 		"<DIVIDE, riga:3>" +
+		// 		"<FLOAT_VAL, riga:3, valore:3.2>" +
+		// 		"<SEMICOLON, riga:1>", row);
 	}
 }

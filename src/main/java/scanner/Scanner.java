@@ -67,10 +67,6 @@ public class Scanner {
 		opAssHM.put("/", TokenType.DIVIDE);
 		opAssHM.put(";", TokenType.SEMICOLON);
 		opAssHM.put("=", TokenType.ASSIGN);
-		opAssHM.put("+=", TokenType.PLUS_ASSIGN);
-		opAssHM.put("-=", TokenType.MINUS_ASSIGN);
-		opAssHM.put("*=", TokenType.MULT_ASSIGN);
-		opAssHM.put("/=", TokenType.DIVIDE_ASSIGN);
 	}
 
 	/**
@@ -165,19 +161,12 @@ public class Scanner {
 	 * @throws IOException
 	 */
 	private Token scanOp() throws LexicalException, IOException {
-		Character fc, sc; // First Char, Second Char;
+		Character c = peekChar();
 
-		fc = readChar();
-
-		sc = peekChar();
-
-		String s = fc.toString() + sc.toString();
-		if (opAssHM.containsKey(s))
+		if (opAssHM.containsKey(c.toString()))
 			readChar();
-		else
-			s = fc.toString();
 
-		return new Token(opAssHM.get(s), riga);
+		return new Token(opAssHM.get(c.toString()), riga);
 	}
 
 	/**
@@ -198,7 +187,10 @@ public class Scanner {
 			sb.append(c);
 			readChar();
 			c = peekChar();
-		} while (letters.contains(c) || digits.contains(c));
+		} while (letters.contains(c));
+
+		if (digits.contains(c))
+			throw new LexicalException("ERRORE: stavo leggendo un ID/keyword, ma é capitato questo carattere '" + c + "' alla riga " + riga);
 
 		TokenType tt = keywordsHM.get(sb.toString());
 
